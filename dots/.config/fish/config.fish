@@ -1,33 +1,35 @@
-# Commands to run in interactive sessions can go here
-if status is-interactive
-    # No greeting
-    set fish_greeting
+set -g fish_greeting ""
 
-    # Use starship
-    function starship_transient_prompt_func
-        starship module character
-    end
-    if test "$TERM" != "linux"
-        starship init fish | source
-        enable_transience
-    end
-    
-    # Colors
-    if test -f ~/.local/state/quickshell/user/generated/terminal/sequences.txt
-        cat ~/.local/state/quickshell/user/generated/terminal/sequences.txt
-    end
+set -gx EDITOR nvim
+set -gx TERMINAL kitty
 
-    # Aliases
-    # kitty doesn't clear properly so we need to do this weird printing
-    alias clear "printf '\033[2J\033[3J\033[1;1H'"
-    alias celar "printf '\033[2J\033[3J\033[1;1H'"
-    alias claer "printf '\033[2J\033[3J\033[1;1H'"
-    alias pamcan pacman
-    alias q 'qs -c ii'
-    if test "$TERM" != "linux"
-        alias ls 'eza --icons'
-    end
-    if test "$TERM" = "xterm-kitty"
-        alias ssh 'kitten ssh'
-    end
+function fish_greeting
+    echo ""
+
+    set_color cyan
+    echo "If the code doesnt run blame the ACL"
+
+    echo ""
+
+    set_color FF6B6B
+    echo "Welcome to b(ash)"
+
+    echo ""
+end
+
+function fish_prompt
+    set_color green
+    echo -n $USER
+    set_color magenta
+    echo -n "@"
+    set_color blue
+    echo -n $hostname
+    set_color white
+    echo -n " > "
+    set_color cyan
+    echo -n (basename (pwd))
+    set_color magenta
+    echo -n " ❯"
+    set_color normal
+    echo -n " "
 end
