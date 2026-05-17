@@ -1,5 +1,3 @@
-hl.bind("CTRL+SUPER+ALT+Slash", hl.dsp.exec_cmd("xdg-open ~/.config/hypr/custom/keybinds.lua"), {description = "Edit user keybinds"} )
-
 hl.bind("CTRL+SUPER+ALT+Slash", hl.dsp.exec_cmd("xdg-open ~/.config/hypr/custom/keybinds.lua"), {description = "Edit user keybinds"})
 
 hl.unbind("SUPER + B")
@@ -18,6 +16,7 @@ hl.bind("SUPER + Q", hl.dsp.exec_cmd("$HOME/.config/hypr/custom/scripts/confirm-
 
 hl.bind("ALT + F4", function() end, {non_consuming = false})
 
+hl.unbind("SUPER + C")
 hl.bind("SUPER + C", hl.dsp.exec_cmd("code"), {description = "VS Code"})
 
 hl.bind("SUPER + A", function() end)
