@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 choice=$(printf "No\nYes" | wofi --dmenu \
-  --prompt "Close window?" \
-  --width 300 --height 120 \
-  --lines 1 --columns 2 \
+  --prompt "" \
+  --width 260 \
+  --height 80 \
+  --lines 1 \
+  --columns 2 \
+  --hide-scroll \
   --location center \
   --style "$HOME/.config/wofi/confirm.css")
 
 if [ "$choice" = "Yes" ]; then
-  target_addr="$(hyprctl -j activewindow | jq -r '.address // empty')"
-  if [ -n "$target_addr" ] && [ "$target_addr" != "null" ]; then
-    hyprctl dispatch closewindow "address:$target_addr"
-  fi
+  hyprctl dispatch 'hl.dsp.window.close()'
 fi
