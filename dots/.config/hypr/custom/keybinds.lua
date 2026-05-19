@@ -19,6 +19,9 @@ hl.bind("ALT + F4", function() end, {non_consuming = false})
 hl.unbind("SUPER + C")
 hl.bind("SUPER + C", hl.dsp.exec_cmd("code"), {description = "VS Code"})
 
+hl.unbind("SUPER + S")
+hl.bind("SUPER + S", hl.dsp.exec_cmd("flatpak run com.stremio.Stremio"), {description = "Stremio"})
+
 hl.bind("SUPER + A", function() end)
 hl.bind("SUPER + O", function() end)
 hl.bind("SUPER + mouse:275", function() end)
