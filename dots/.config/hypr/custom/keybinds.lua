@@ -6,8 +6,11 @@ hl.bind("SUPER + B", hl.dsp.exec_cmd("brave-origin-nightly"), {description = "Br
 hl.bind("mouse:275", hl.dsp.focus({workspace = "e-1"}))
 hl.bind("mouse:276", hl.dsp.focus({workspace = "e+1"}))
 
-hl.unbind("SUPER + X")
-hl.bind("SUPER + X", hl.dsp.exec_cmd("env CODEX_HOME=$HOME/.codex-cursor cursor --user-data-dir ~/.cursor-free"), {description = "Cursor (separate profile)"})
+hl.unbind("SUPER + T")
+hl.bind("SUPER + T", hl.dsp.exec_cmd("gtk-launch tlauncher"), {description = "TLauncher"})
+
+hl.unbind("SUPER + Space")
+hl.bind("SUPER + Space", hl.dsp.exec_cmd("$HOME/.local/bin/multi-codex.AppImage"), {description = "Multi Codex"})
 
 hl.bind("mouse:274", hl.dsp.exec_cmd("ydotool key 29:1 15:1 15:0 && sleep 0.3 && ydotool key 29:0"), {mouse = true})
 
