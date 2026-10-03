@@ -15,7 +15,17 @@ hl.bind("SUPER + Space", hl.dsp.exec_cmd("$HOME/.local/bin/multi-codex.AppImage"
 hl.bind("mouse:274", hl.dsp.exec_cmd("ydotool key 29:1 15:1 15:0 && sleep 0.3 && ydotool key 29:0"), {mouse = true})
 
 hl.unbind("SUPER + Q")
-hl.bind("SUPER + Q", hl.dsp.exec_cmd("$HOME/.config/hypr/custom/scripts/confirm-close.sh"), {description = "Confirm before closing"})
+hl.bind("SUPER + Q", function()
+    local window = hl.get_active_window()
+    if not window then return end
+    hl.dispatch(hl.dsp.exec_cmd(string.format(
+        '"$HOME/.config/hypr/custom/scripts/confirm-close.sh" %s %d %d',
+        window.address, window.pid, window.stable_id
+    )))
+end, {description = "Confirm before closing"})
+
+hl.unbind("SUPER + SHIFT + Q")
+hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd('"$HOME/.config/hypr/custom/scripts/restore-closed.sh"'), {description = "Reopen last closed app"})
 
 hl.bind("ALT + F4", function() end, {non_consuming = false})
 
