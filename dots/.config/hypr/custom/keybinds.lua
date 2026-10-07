@@ -41,3 +41,6 @@ hl.bind("SUPER + mouse:275", function() end)
 hl.bind("SUPER + mouse_up", function() end)
 hl.bind("SUPER + mouse_down", function() end)
 hl.bind("SUPER + H", hl.dsp.exec_cmd("~/.local/bin/hyprtrack-desktop.AppImage"))
+
+hl.unbind("SUPER + R")
+hl.bind("SUPER + R", hl.dsp.exec_cmd("env -u ELECTRON_RUN_AS_NODE recordly --ozone-platform=x11"), {description = "Recordly"})
