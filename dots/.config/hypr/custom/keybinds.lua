@@ -43,4 +43,4 @@ hl.bind("SUPER + mouse_down", function() end)
 hl.bind("SUPER + H", hl.dsp.exec_cmd("~/.local/bin/hyprtrack-desktop.AppImage"))
 
 hl.unbind("SUPER + R")
-hl.bind("SUPER + R", hl.dsp.exec_cmd('"$HOME/.config/hypr/custom/scripts/recordly-editor.sh"'), {description = "Recordly Editor"})
+hl.bind("SUPER + R", hl.dsp.exec_cmd("env -u ELECTRON_RUN_AS_NODE GDK_BACKEND=x11 gtk-launch Cap"), {description = "Cap"})
