@@ -1,7 +1,8 @@
 # HyprTrack and to-do sidebar
 
 Super+A opens the existing left drawer, at its original 460px configured width.
-The top shows **Today’s usage**, **Daily average**, and a seven-day line chart.
+The top shows **Today’s usage**, **Daily average**, **Today’s internet**,
+a compact live download/upload speed row, and a seven-day line chart.
 Hover over the line for a day's date and duration. The arrow opens the installed
 HyprTrack app. There is no weekly-total metric, scratchpad, or shortcut footer.
 The logo is the original `next/app/icon.svg` asset copied byte-for-byte from
@@ -25,8 +26,7 @@ when formatting the device; configuration snapshots do not include personal task
 database at `~/.local/bin/hyprtrack/collector/hyprtrack.db`. It does not change
 HyprTrack source, the collector, or its schema. SQLite is opened read-only with
 query-only enabled; committed WAL data remains visible. A missing database is
-never created. No window titles, app names, URLs, network data, or telemetry are
-read or sent anywhere. Runtime requirements are existing QuickShell and Python 3
+never created. No window titles, app names, URLs, packet contents, or telemetry are read or sent anywhere. Runtime requirements are existing QuickShell and Python 3
 with its standard SQLite module. There is no extra collector or service.
 
 The range is today and the preceding six calendar days in IST, matching
@@ -99,3 +99,26 @@ read-only preservation, install idempotency, unknown edits, rollback and restore
 An isolated running QML drawer also checks task creation, sorting, completion,
 deletion, persistence, data/error states, visibility-based refresh and original
 drawer width. Test usage/tasks stay separate from personal data.
+
+
+## Internet summary and passive live speed
+
+The top strip has three metrics: today’s screen time, the seven-day daily
+average, and today’s internet usage (download + upload, all apps/services, IST).
+The internet figure reads existing `network_samples` and daily summaries in the
+same read-only SQLite snapshot. Older databases without network tables show a
+dash. It refreshes with the screen-time summary every 15 seconds.
+
+The compact Live row shows download and upload speed in B/s, KB/s or MB/s.
+One helper process reads `/sys/class/net` physical-interface byte counters once
+per second only while the drawer is visible. It sends no requests, runs no speed
+test, writes no samples, and needs no capture permission. Loopback and virtual
+interfaces are excluded to avoid counting duplicate layers; LAN traffic is
+included. Speeds reflect recent actual traffic, not the connection’s maximum
+capacity. The first sample/reopening establishes a fresh baseline; reconnects,
+interface replacement and counter resets cannot inflate a rate.
+
+The installer accepts the explicitly recorded SHA256 hashes of the previous
+summary component/helper for this upgrade, backs up configuration and applies
+changes atomically. Unknown personal edits still stop installation. The new
+package includes `asset-versions.json` for this checked migration.

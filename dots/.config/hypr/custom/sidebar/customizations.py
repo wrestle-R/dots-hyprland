@@ -2,6 +2,7 @@
 """Back up desktop configs and check/reapply the HyprTrack sidebar customization."""
 
 import argparse
+import hashlib
 from datetime import datetime, timezone
 import json
 import os
@@ -67,6 +68,7 @@ def plan(config_root):
         "SidebarDashboard.qml": "quickshell/ii/modules/ii/sidebarLeft/SidebarDashboard.qml",
         "hyprtrack-summary.py": "hypr/custom/scripts/hyprtrack-summary.py",
     }
+    previous_assets = json.loads((HERE / "asset-versions.json").read_text())
     for name, relative in assets.items():
         path = config_root / relative
         old = path.read_bytes() if path.exists() else None
@@ -74,7 +76,7 @@ def plan(config_root):
         if old == new:
             continue
         # New assets may be absent. Never replace unrecognized personal edits.
-        if old is not None:
+        if old is not None and hashlib.sha256(old).hexdigest() not in previous_assets.get(name, []):
             raise CompatibilityError(f"Customized sidebar asset differs: {relative}; installation stopped.")
         changes.append((path, old, new))
     # Install dependencies before the watched entry point can load them.

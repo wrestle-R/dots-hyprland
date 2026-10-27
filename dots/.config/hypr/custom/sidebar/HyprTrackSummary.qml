@@ -12,6 +12,7 @@ ColumnLayout {
     property bool active: false
     property var usage: null
     property string errorText: ""
+    property var speed: null
     readonly property color accent: "#ff914d"
     readonly property string helperPath: FileUtils.trimFileProtocol(`${Directories.config}/hypr/custom/scripts/hyprtrack-summary.py`)
     property int selectedDay: -1
@@ -22,10 +23,22 @@ ColumnLayout {
         const value = Math.max(0, Math.floor(minutes));
         return value >= 60 ? `${Math.floor(value / 60)}h ${String(value % 60).padStart(2, "0")}m` : `${value}m`;
     }
+    function formatBytes(bytes) {
+        if (bytes === null || bytes === undefined || !Number.isFinite(bytes)) return "—";
+        const units = ["B", "KB", "MB", "GB", "TB"];
+        let value = Math.max(0, bytes), unit = 0;
+        while (value >= 1000 && unit < units.length - 1) { value /= 1000; unit++; }
+        return `${value.toFixed(unit === 0 || value >= 100 ? 0 : 1)} ${units[unit]}`;
+    }
     function refresh() {
         if (active && !reader.running) reader.running = true;
     }
-    onActiveChanged: { if (active) refresh(); }
+    onActiveChanged: {
+        root.speed = null;
+        speedRestart.stop();
+        speedReader.running = active;
+        if (active) refresh();
+    }
     onUsageChanged: chart.requestPaint()
     onSelectedDayChanged: chart.requestPaint()
     Component.onCompleted: refresh()
@@ -72,6 +85,27 @@ ColumnLayout {
         }
     }
 
+    Process {
+        id: speedReader
+        command: ["python3", root.helperPath, "--watch-speed"]
+        running: root.active
+        stdout: SplitParser {
+            onRead: line => {
+                try { root.speed = JSON.parse(line); }
+                catch (error) { root.speed = null; }
+            }
+        }
+        onExited: {
+            root.speed = null;
+            if (root.active) speedRestart.restart();
+        }
+    }
+    Timer {
+        id: speedRestart
+        interval: 3000
+        onTriggered: { if (root.active) speedReader.running = true; }
+    }
+
     RowLayout {
         Layout.fillWidth: true
         spacing: 10
@@ -113,41 +147,66 @@ ColumnLayout {
     RowLayout {
         Layout.fillWidth: true
         Layout.topMargin: 4
-        spacing: 20
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 3
-            StyledText {
-                objectName: "hyprtrackToday"
-                text: root.usage ? root.formatTime(root.usage.todayMinutes) : "—"
-                font.pixelSize: 28
-                font.weight: Font.DemiBold
-            }
-            StyledText {
-                text: "Today’s usage"
-                font.pixelSize: 13
-                color: Appearance.colors.colSubtext
+        spacing: 12
+        Repeater {
+            model: [
+                { key: "hyprtrackToday", value: root.usage ? root.formatTime(root.usage.todayMinutes) : "—", label: "Today’s usage" },
+                { key: "hyprtrackAverage", value: root.usage ? root.formatTime(root.usage.averageMinutes) : "—", label: "Daily average" },
+                { key: "hyprtrackInternet", value: root.usage ? root.formatBytes(root.usage.todayInternetBytes) : "—", label: "Today’s internet" }
+            ]
+            ColumnLayout {
+                required property var modelData
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                spacing: 4
+                StyledText {
+                    objectName: modelData.key
+                    Layout.fillWidth: true
+                    text: modelData.value
+                    font.pixelSize: 23
+                    font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                }
+                StyledText {
+                    Layout.fillWidth: true
+                    text: modelData.label
+                    font.pixelSize: 11
+                    color: Appearance.colors.colSubtext
+                    elide: Text.ElideRight
+                }
             }
         }
-        Rectangle {
-            Layout.preferredWidth: 1
-            Layout.preferredHeight: 41
-            color: Appearance.colors.colLayer0Border
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.topMargin: 2
+        spacing: 8
+        MaterialSymbol {
+            text: "swap_vert"
+            iconSize: 19
+            color: Appearance.colors.colSubtext
         }
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 3
-            StyledText {
-                objectName: "hyprtrackAverage"
-                text: root.usage ? root.formatTime(root.usage.averageMinutes) : "—"
-                font.pixelSize: 28
-                font.weight: Font.DemiBold
-            }
-            StyledText {
-                text: "Daily average"
-                font.pixelSize: 13
-                color: Appearance.colors.colSubtext
-            }
+        StyledText {
+            text: "Live"
+            font.pixelSize: 12
+            color: Appearance.colors.colSubtext
+        }
+        Item { Layout.fillWidth: true }
+        StyledText {
+            objectName: "hyprtrackDownloadSpeed"
+            text: `↓ ${root.speed?.ready ? root.formatBytes(root.speed.rxBytesPerSecond) + "/s" : "—"}`
+            font.pixelSize: 13
+            font.weight: Font.Medium
+            Accessible.name: `Download speed: ${text}`
+        }
+        StyledText {
+            Layout.leftMargin: 10
+            objectName: "hyprtrackUploadSpeed"
+            text: `↑ ${root.speed?.ready ? root.formatBytes(root.speed.txBytesPerSecond) + "/s" : "—"}`
+            font.pixelSize: 13
+            font.weight: Font.Medium
+            Accessible.name: `Upload speed: ${text}`
         }
     }
 
@@ -238,5 +297,5 @@ ColumnLayout {
     HoverHandler { id: summaryHover }
     ToolTip.visible: summaryHover.hovered && !chartMouse.containsMouse && root.usage !== null
     ToolTip.delay: 1200
-    ToolTip.text: "Daily average covers days with recorded usage in the last 7 days, including today. Times use IST."
+    ToolTip.text: "Daily average covers days with recorded usage in the last 7 days, including today. Times use IST. Today’s internet includes downloads and uploads. Live speeds use local interface counters only, including LAN traffic; no speed tests or internet requests."
 }

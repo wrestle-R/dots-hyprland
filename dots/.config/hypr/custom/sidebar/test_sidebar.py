@@ -93,6 +93,38 @@ class SummaryTests(unittest.TestCase):
         self.assertEqual(self.result()["todayMinutes"], 45)
 
 
+class NetworkTests(unittest.TestCase):
+    def test_rates_ignore_new_reset_and_recreated_interfaces(self):
+        self.assertEqual(summary.network_rates({"wlan0": (2, 1000, 500)}, {"wlan0": (2, 3000, 1000)}, 2), (1000, 250))
+        for current in [{"wlan0": (3, 900000, 800000)}, {"wlan0": (2, 2, 1)}, {"eth0": (4, 80000, 90000)}]:
+            self.assertEqual(summary.network_rates({"wlan0": (2, 1000, 500)}, current, 1), (0, 0))
+        self.assertEqual(summary.network_rates({}, {}, 0), (None, None))
+
+    def test_only_active_physical_counters_are_read(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name, physical, state in [("lo", False, "up"), ("tun0", False, "up"), ("wlan0", True, "up"), ("eth0", True, "down")]:
+                path = root / name
+                (path / "statistics").mkdir(parents=True)
+                if physical: (path / "device").mkdir()
+                for file, value in [("operstate", state), ("ifindex", "2"), ("statistics/rx_bytes", "1000"), ("statistics/tx_bytes", "200")]:
+                    (path / file).write_text(value)
+            self.assertEqual(summary.network_counters(root), {"wlan0": (2, 1000, 200)})
+
+    def test_today_total_uses_ist_and_both_directions_without_mutation(self):
+        connection = sqlite3.connect(":memory:")
+        self.addCleanup(connection.close)
+        now = summary.parse_timestamp("2026-10-27T12:00:00+05:30")
+        midnight = now.replace(hour=0)
+        self.assertIsNone(summary.today_internet(connection, midnight, now))
+        connection.execute("CREATE TABLE network_samples(sampled_at INTEGER, rx_bytes INTEGER, tx_bytes INTEGER)")
+        connection.execute("CREATE TABLE network_daily_summaries(day TEXT, rx_bytes INTEGER, tx_bytes INTEGER)")
+        connection.executemany("INSERT INTO network_samples VALUES(?,?,?)", [(int(midnight.timestamp())-1, 10000, 10000), (int(midnight.timestamp()), 100, 25), (int(now.timestamp()), 50, 5), (int(now.timestamp())+1, 9999, 9999)])
+        connection.executemany("INSERT INTO network_daily_summaries VALUES(?,?,?)", [("2026-10-27", 20, 10), ("2026-10-26", 9000, 9000)])
+        connection.execute("PRAGMA query_only=ON")
+        self.assertEqual(summary.today_internet(connection, midnight, now), 210)
+
+
 class InstallationTests(unittest.TestCase):
     def setUp(self):
         import json
