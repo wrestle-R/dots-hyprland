@@ -7,6 +7,14 @@
     "1f74e01d04bf8883b08acbd8f13b83122d3a92f3fba829eb23349a88f41bedf6"
   ],
   "SidebarDashboard.qml": [
-    "a6598332ca468013093aea8c8dc27425c3752a6603c0fd18ce130ec39e8b4d2b"
+    "a6598332ca468013093aea8c8dc27425c3752a6603c0fd18ce130ec39e8b4d2b",
+    "445be7d6fc9c11c32e1c27ea6ac15435a14d147e935e321b70505f95ac9dc451"
+  ],
+  "SpotifyMiniPlayer.qml": [
+    "025e37f56d0d9ae1068ac6ebd774e16688c2b7cdcdc164b7bfca0d5b5f7b76b8",
+    "ab0250a058d93db04001d15fa91f2fe900db46e974750d304e19b86081b3ea35"
+  ],
+  "spotify-sidebar.py": [
+    "c44ae10ba060ef8a4912d9b80a4282189bacd65ec92b0c0b04d047d99a2d3a06"
   ]
 }

@@ -1,3 +1,4 @@
+import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -92,6 +93,11 @@ Item {
                     ...(root.animeEnabled ? [anime.createObject()] : []),
                 ]
             }
+        }
+
+        SpotifyMiniPlayer {
+            Layout.fillWidth: true
+            active: GlobalStates.sidebarLeftOpen && root.visible
         }
 
         Component {

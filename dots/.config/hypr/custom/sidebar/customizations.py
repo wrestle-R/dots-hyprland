@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Back up desktop configs and check/reapply the HyprTrack sidebar customization."""
+"""Back up desktop configs and check/reapply the personal sidebar customization."""
 
 import argparse
 import hashlib
@@ -14,6 +14,11 @@ import tempfile
 
 HERE = Path(__file__).resolve().parent
 CONFIG_DIRS = ("hypr", "quickshell/ii", "illogical-impulse")
+SPOTIFY_HOOK = '''
+-- Spotify sidebar launcher (managed integration)
+local spotifyShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/spotify-shortcuts.lua"
+if is_file_exists(spotifyShortcuts) then dofile(spotifyShortcuts) end
+'''
 
 
 class CompatibilityError(Exception):
@@ -68,6 +73,9 @@ def plan(config_root):
         "HyprTrackSummary.qml": "quickshell/ii/modules/ii/sidebarLeft/HyprTrackSummary.qml",
         "SidebarDashboard.qml": "quickshell/ii/modules/ii/sidebarLeft/SidebarDashboard.qml",
         "hyprtrack-summary.py": "hypr/custom/scripts/hyprtrack-summary.py",
+        "SpotifyMiniPlayer.qml": "quickshell/ii/modules/ii/sidebarLeft/SpotifyMiniPlayer.qml",
+        "spotify-sidebar.py": "hypr/custom/scripts/spotify-sidebar.py",
+        "spotify-shortcuts.lua": "hypr/custom/spotify-shortcuts.lua",
     }
     previous_assets = json.loads((HERE / "asset-versions.json").read_text())
     for name, relative in assets.items():
@@ -80,8 +88,18 @@ def plan(config_root):
         if old is not None and hashlib.sha256(old).hexdigest() not in previous_assets.get(name, []):
             raise CompatibilityError(f"Customized sidebar asset differs: {relative}; installation stopped.")
         changes.append((path, old, new))
+    keybinds = config_root / "hypr/custom/keybinds.lua"
+    old = keybinds.read_bytes() if keybinds.exists() else None
+    text = old.decode() if old is not None else ""
+    if SPOTIFY_HOOK not in text:
+        if "spotifyShortcuts" in text or "Spotify sidebar launcher (managed integration)" in text:
+            raise CompatibilityError("Spotify shortcut hook was edited; installation stopped.")
+        # The settings installer owns the final block; preserve its exact suffix.
+        settings_marker = "-- Local settings shortcuts (managed integration)"
+        updated = text.replace(settings_marker, SPOTIFY_HOOK + "\n" + settings_marker, 1) if settings_marker in text else text + SPOTIFY_HOOK
+        changes.append((keybinds, old, updated.encode()))
     # Install dependencies before the watched entry point can load them.
-    return sorted(changes, key=lambda change: change[0].name == "SidebarLeftContent.qml")
+    return sorted(changes, key=lambda change: change[0].name in ("SidebarLeftContent.qml", "keybinds.lua"))
 
 
 def write_atomic(path, content, mode=None):
@@ -115,7 +133,7 @@ def install(config_root, backup_root):
     try:
         for path, old, new in changes:
             mode = path.stat().st_mode & 0o777 if path.exists() else None
-            write_atomic(path, new, 0o755 if path.name == "hyprtrack-summary.py" else mode)
+            write_atomic(path, new, 0o755 if path.name.endswith(".py") else mode)
             written.append((path, old, mode))
     except Exception:
         for path, old, mode in reversed(written):

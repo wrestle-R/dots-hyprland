@@ -9,6 +9,7 @@ import QtQuick.Window
 
 FocusScope {
     id: root
+    objectName: "sidebarDashboard"
     property bool active: GlobalStates.sidebarLeftOpen
     readonly property color accent: "#ff914d"
     readonly property var tasks: Todo.list.map((task, i) => ({content: task.content, done: task.done, originalIndex: i}))
@@ -25,11 +26,10 @@ FocusScope {
         }
     }
     function focusTaskInput() {
-        taskList.positionViewAtEnd();
-        taskList.footerItem?.inputField.forceActiveFocus();
+        taskInput.forceActiveFocus();
     }
     function addTask() {
-        const input = taskList.footerItem?.inputField;
+        const input = taskInput;
         if (!input) return;
         const task = input.text.trim();
         if (task.length === 0) return;
@@ -46,6 +46,8 @@ FocusScope {
         HyprTrackSummary {
             objectName: "hyprtrackSummary"
             Layout.fillWidth: true
+            Layout.fillHeight: false
+            Layout.maximumHeight: implicitHeight
             active: root.active && root.visible
         }
         Rectangle {
@@ -161,60 +163,59 @@ FocusScope {
                     color: Appearance.colors.colLayer0Border
                 }
             }
-            footer: ColumnLayout {
-                property alias inputField: taskInput
-                width: taskList.width
-                spacing: 10
-                RowLayout {
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 10
+                spacing: 7
+                TextField {
+                    id: taskInput
+                    focus: true
+                    objectName: "sidebarTaskInput"
                     Layout.fillWidth: true
-                    Layout.topMargin: 10
-                    spacing: 7
-                    TextField {
-                        id: taskInput
-                        focus: true
-                        objectName: "sidebarTaskInput"
-                        Layout.fillWidth: true
-                        implicitHeight: 42
-                        placeholderText: "Add a task…"
-                        placeholderTextColor: Appearance.colors.colSubtext
-                        color: Appearance.colors.colOnLayer0
-                        font.family: Appearance.font.family.main
-                        font.pixelSize: 14
-                        selectByMouse: true
-                        maximumLength: 2000
-                        selectedTextColor: Appearance.colors.colOnSecondaryContainer
-                        selectionColor: Appearance.colors.colSecondaryContainer
-                        Accessible.name: "New task"
-                        onAccepted: root.addTask()
-                        background: Rectangle {
-                            radius: 9
-                            color: Appearance.colors.colLayer1
-                            border.width: taskInput.activeFocus ? 1 : 0
-                            border.color: root.accent
-                        }
-                    }
-                    RippleButton {
-                        objectName: "saveSidebarTask"
-                        implicitWidth: 36
-                        implicitHeight: 38
-                        enabled: taskInput.text.trim().length > 0
-                        Accessible.name: "Save task"
-                        onClicked: root.addTask()
-                        contentItem: MaterialSymbol {
-                            text: "add"
-                            iconSize: 22
-                            horizontalAlignment: Text.AlignHCenter
-                            color: root.accent
-                        }
+                    implicitHeight: 42
+                    placeholderText: "Add a task…"
+                    placeholderTextColor: Appearance.colors.colSubtext
+                    color: Appearance.colors.colOnLayer0
+                    font.family: Appearance.font.family.main
+                    font.pixelSize: 14
+                    selectByMouse: true
+                    maximumLength: 2000
+                    selectedTextColor: Appearance.colors.colOnSecondaryContainer
+                    selectionColor: Appearance.colors.colSecondaryContainer
+                    Accessible.name: "New task"
+                    onAccepted: root.addTask()
+                    background: Rectangle {
+                        radius: 9
+                        color: Appearance.colors.colLayer1
+                        border.width: taskInput.activeFocus ? 1 : 0
+                        border.color: root.accent
                     }
                 }
-                StyledText {
-                    Layout.fillWidth: true
-                    visible: Todo.list.length === 0
-                    text: "A little room for what’s next."
-                    font.pixelSize: 12
-                    color: Appearance.colors.colSubtext
+                RippleButton {
+                    objectName: "saveSidebarTask"
+                    implicitWidth: 36
+                    implicitHeight: 38
+                    enabled: taskInput.text.trim().length > 0
+                    Accessible.name: "Save task"
+                    onClicked: root.addTask()
+                    contentItem: MaterialSymbol {
+                        text: "add"
+                        iconSize: 22
+                        horizontalAlignment: Text.AlignHCenter
+                        color: root.accent
+                    }
                 }
+            }
+            StyledText {
+                Layout.fillWidth: true
+                visible: Todo.list.length === 0
+                text: "A little room for what’s next."
+                font.pixelSize: 12
+                color: Appearance.colors.colSubtext
             }
         }
     }

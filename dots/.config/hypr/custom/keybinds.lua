@@ -44,3 +44,7 @@ hl.bind("SUPER + H", hl.dsp.exec_cmd("~/.local/bin/hyprtrack-desktop.AppImage"))
 
 hl.unbind("SUPER + R")
 hl.bind("SUPER + R", hl.dsp.exec_cmd("env -u ELECTRON_RUN_AS_NODE GDK_BACKEND=x11 gtk-launch Cap"), {description = "Cap"})
+
+-- Spotify sidebar launcher (managed integration)
+local spotifyShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/spotify-shortcuts.lua"
+if is_file_exists(spotifyShortcuts) then dofile(spotifyShortcuts) end

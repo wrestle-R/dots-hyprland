@@ -178,6 +178,29 @@ class InstallationTests(unittest.TestCase):
         self.assertEqual(self.content.read_text(), self.edit["before"])
         self.assertFalse((self.content.parent / "HyprTrackSummary.qml").exists())
 
+    def test_upgrade_preserves_custom_shortcuts_and_settings_suffix(self):
+        self.content.write_text(self.edit["previous"][-1])
+        keybinds = self.root / "hypr/custom/keybinds.lua"
+        keybinds.parent.mkdir(parents=True)
+        original = 'hl.bind("SUPER + W", "zen-browser")\n'
+        suffix = '\n-- Local settings shortcuts (managed integration)\n-- existing settings integration\n'
+        keybinds.write_text(original + suffix)
+        installer.install(self.root, self.backups)
+        updated = keybinds.read_text()
+        self.assertTrue(updated.startswith(original))
+        self.assertTrue(updated.endswith(suffix))
+        self.assertEqual(updated.count(installer.SPOTIFY_HOOK), 1)
+        self.assertEqual(installer.plan(self.root), [])
+
+    def test_partial_spotify_hook_stops_before_any_writes(self):
+        keybinds = self.root / "hypr/custom/keybinds.lua"
+        keybinds.parent.mkdir(parents=True)
+        keybinds.write_text('local spotifyShortcuts = "personal-change"\n')
+        with self.assertRaises(installer.CompatibilityError):
+            installer.install(self.root, self.backups)
+        self.assertFalse(self.backups.exists())
+        self.assertEqual(self.content.read_text(), self.edit["before"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -51,7 +51,7 @@ Canonical rebuild package: `~/Desktop/code/Linux/End-4/sidebar/`. An identical
 copy lives in the dotfiles repo's `dots/.config/hypr/custom/sidebar/`. The upstream
 QuickShell source files in that repo remain unchanged. The installer applies
 one supported-version integration to the live `SidebarLeftContent.qml`, adds
-two local QML components plus the original logo, and installs the helper under
+four local QML components plus the original logo, and installs the helper under
 `~/.config/hypr/custom/scripts/hyprtrack-summary.py`. Existing optional
 AI/Translator/Anime pages remain available when enabled; the dashboard is first.
 
@@ -135,3 +135,18 @@ do not take keyboard focus, and disappear when the drawer closes. The former
 summary-wide explanation and default Qt chart tooltip are removed. The installer
 installs the shared component before its consumers and recognizes the previous
 summary/dashboard hashes for a backed-up upgrade. Unknown edits still stop it.
+
+
+## Spotify footer and task navigation
+
+The sidebar now has a compact Spotify TUI player below its pages: previous,
+confirmed play/pause, next, a seek slider and **Open player**. Super+S opens or
+focuses the installed terminal player, with no shortcut text in the card.
+Task entry stays below the scrolling list; loading usage cannot stretch it out
+of view. The desktop Spotify package is no longer needed after local playback
+has been set up and tested.
+
+See [Spotify setup and recreation](SPOTIFY.md) for the download, browser sign-in,
+Soloist pairing, exact installed files, upstream update procedure, rollback,
+screenshots with generic data and verification details. This is a personal
+Hyprland integration, with no changes to the Spotify-Tui source repository.
