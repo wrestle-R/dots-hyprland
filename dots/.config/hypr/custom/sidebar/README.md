@@ -3,7 +3,9 @@
 Super+A opens the existing left drawer, at its original 460px configured width.
 The top shows **Today’s usage**, **Daily average**, **Today’s internet**,
 a compact live download/upload speed row, and a seven-day line chart.
-Hover over the line for a day's date and duration. The arrow opens the installed
+Hover over the line for a day's date and duration in a rounded, theme-aware
+card with an orange duration and IST label. Hints stay inside the drawer; each
+metric and the live speed row has its own short explanation. The arrow opens the installed
 HyprTrack app. There is no weekly-total metric, scratchpad, or shortcut footer.
 The logo is the original `next/app/icon.svg` asset copied byte-for-byte from
 HyprTrack, rather than a recreated waveform. The source app remains unchanged.
@@ -122,3 +124,14 @@ The installer accepts the explicitly recorded SHA256 hashes of the previous
 summary component/helper for this upgrade, backs up configuration and applies
 changes atomically. Unknown personal edits still stop installation. The new
 package includes `asset-versions.json` for this checked migration.
+
+## Sidebar tooltip styling
+
+`SidebarToolTip.qml` is shared only by this dashboard: the chart, individual
+metrics, live speeds and action buttons. It uses the shell palette/font, a subtle
+border, 12px corners/padding and a short fade. Chart hints follow the selected
+day and clamp horizontally within the plot; other hints wrap at 280px. Hints
+do not take keyboard focus, and disappear when the drawer closes. The former
+summary-wide explanation and default Qt chart tooltip are removed. The installer
+installs the shared component before its consumers and recognizes the previous
+summary/dashboard hashes for a backed-up upgrade. Unknown edits still stop it.

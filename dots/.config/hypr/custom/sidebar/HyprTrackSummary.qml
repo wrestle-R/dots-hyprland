@@ -140,7 +140,7 @@ ColumnLayout {
                 horizontalAlignment: Text.AlignHCenter
                 color: Appearance.colors.colSubtext
             }
-            StyledToolTip { text: "Open HyprTrack" }
+            SidebarToolTip { horizontalBounds: root; visible: root.active && parent.hovered; text: "Open HyprTrack" }
         }
     }
 
@@ -150,11 +150,12 @@ ColumnLayout {
         spacing: 12
         Repeater {
             model: [
-                { key: "hyprtrackToday", value: root.usage ? root.formatTime(root.usage.todayMinutes) : "—", label: "Today’s usage" },
-                { key: "hyprtrackAverage", value: root.usage ? root.formatTime(root.usage.averageMinutes) : "—", label: "Daily average" },
-                { key: "hyprtrackInternet", value: root.usage ? root.formatBytes(root.usage.todayInternetBytes) : "—", label: "Today’s internet" }
+                { key: "hyprtrackToday", value: root.usage ? root.formatTime(root.usage.todayMinutes) : "—", label: "Today’s usage", hint: "Screen time recorded today. Resets at midnight IST." },
+                { key: "hyprtrackAverage", value: root.usage ? root.formatTime(root.usage.averageMinutes) : "—", label: "Daily average", hint: "Average across days with recorded usage in the last 7 days, including today. Times use IST." },
+                { key: "hyprtrackInternet", value: root.usage ? root.formatBytes(root.usage.todayInternetBytes) : "—", label: "Today’s internet", hint: "Today’s downloads + uploads across apps and services, using IST. A dash means internet data is unavailable." }
             ]
             ColumnLayout {
+                id: metric
                 required property var modelData
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
@@ -174,12 +175,20 @@ ColumnLayout {
                     color: Appearance.colors.colSubtext
                     elide: Text.ElideRight
                 }
+                HoverHandler { id: metricHover }
+                SidebarToolTip {
+                    horizontalBounds: root
+                    visible: root.active && metricHover.hovered
+                    heading: metric.modelData.label
+                    text: metric.modelData.hint
+                }
             }
         }
     }
 
     RowLayout {
         Layout.fillWidth: true
+        id: speedRow
         Layout.topMargin: 2
         spacing: 8
         MaterialSymbol {
@@ -207,6 +216,13 @@ ColumnLayout {
             font.pixelSize: 13
             font.weight: Font.Medium
             Accessible.name: `Upload speed: ${text}`
+        }
+        HoverHandler { id: speedHover }
+        SidebarToolTip {
+            horizontalBounds: root
+            visible: root.active && speedHover.hovered
+            heading: "Live transfer speed"
+            text: "↓ Download  ·  ↑ Upload\nCurrent traffic, including LAN. Read locally once a second; no speed tests or internet requests."
         }
     }
 
@@ -256,11 +272,25 @@ ColumnLayout {
                 id: chartMouse
                 anchors.fill: parent
                 hoverEnabled: true
-                onPositionChanged: mouse => root.selectedDay = Math.max(0, Math.min(6, Math.round((mouse.x - 18) / (width - 36) * 6)))
+                function selectAt(position) {
+                    root.selectedDay = Math.max(0, Math.min(6, Math.round((position - 18) / Math.max(1, width - 36) * 6)));
+                }
+                onEntered: selectAt(mouseX)
+                onPositionChanged: mouse => selectAt(mouse.x)
                 onExited: root.selectedDay = -1
-                ToolTip.visible: containsMouse && root.days.length === 7
-                ToolTip.text: root.selectedDay >= 0 && root.days.length === 7
-                    ? `${root.days[root.selectedDay].date} · ${root.formatTime(root.days[root.selectedDay].minutes)}` : ""
+                SidebarToolTip {
+                    horizontalBounds: root
+                    id: chartTip
+                    readonly property var day: root.selectedDay >= 0 ? root.days[root.selectedDay] : null
+                    visible: root.active && chartMouse.containsMouse && root.days.length === 7 && day !== null
+                    delay: 180
+                    maximumWidth: 190
+                    x: Math.max(0, Math.min(chartMouse.width - width,
+                        18 + root.selectedDay * (chartMouse.width - 36) / 6 - width / 2))
+                    heading: day ? Qt.formatDate(new Date(`${day.date}T12:00:00`), "ddd, d MMM yyyy") : ""
+                    value: day ? root.formatTime(day.minutes) : ""
+                    text: "Screen time · IST"
+                }
             }
         }
         RowLayout {
@@ -294,8 +324,4 @@ ColumnLayout {
         font.pixelSize: 11
         color: Appearance.colors.colSubtext
     }
-    HoverHandler { id: summaryHover }
-    ToolTip.visible: summaryHover.hovered && !chartMouse.containsMouse && root.usage !== null
-    ToolTip.delay: 1200
-    ToolTip.text: "Daily average covers days with recorded usage in the last 7 days, including today. Times use IST. Today’s internet includes downloads and uploads. Live speeds use local interface counters only, including LAN traffic; no speed tests or internet requests."
 }

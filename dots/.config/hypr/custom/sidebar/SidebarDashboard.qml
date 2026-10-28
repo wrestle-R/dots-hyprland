@@ -80,7 +80,7 @@ FocusScope {
                     iconSize: 25
                     horizontalAlignment: Text.AlignHCenter
                 }
-                StyledToolTip { text: "Add a task" }
+                SidebarToolTip { horizontalBounds: root; visible: root.active && parent.hovered; text: "Add a task" }
             }
         }
         ListView {
@@ -151,7 +151,7 @@ FocusScope {
                             horizontalAlignment: Text.AlignHCenter
                             color: Appearance.colors.colSubtext
                         }
-                        StyledToolTip { text: "Delete task" }
+                        SidebarToolTip { horizontalBounds: root; visible: root.active && parent.hovered; text: "Delete task" }
                     }
                 }
                 Rectangle {

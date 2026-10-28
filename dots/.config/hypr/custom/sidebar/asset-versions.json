@@ -1,8 +1,12 @@
 {
   "HyprTrackSummary.qml": [
-    "76fd511cc6b2dc6456a060dc35859c72dfb39169b2b12d287351edd70d514c56"
+    "76fd511cc6b2dc6456a060dc35859c72dfb39169b2b12d287351edd70d514c56",
+    "22e66a00a0ef42366535e1f3197747eb13dded9c157c0aebea4580a2469f9a23"
   ],
   "hyprtrack-summary.py": [
     "1f74e01d04bf8883b08acbd8f13b83122d3a92f3fba829eb23349a88f41bedf6"
+  ],
+  "SidebarDashboard.qml": [
+    "a6598332ca468013093aea8c8dc27425c3752a6603c0fd18ce130ec39e8b4d2b"
   ]
 }

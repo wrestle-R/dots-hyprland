@@ -64,6 +64,7 @@ def plan(config_root):
         changes.append((path, old, edit["after"].encode()))
     assets = {
         "hyprtrack-logo.svg": "quickshell/ii/modules/ii/sidebarLeft/hyprtrack-logo.svg",
+        "SidebarToolTip.qml": "quickshell/ii/modules/ii/sidebarLeft/SidebarToolTip.qml",
         "HyprTrackSummary.qml": "quickshell/ii/modules/ii/sidebarLeft/HyprTrackSummary.qml",
         "SidebarDashboard.qml": "quickshell/ii/modules/ii/sidebarLeft/SidebarDashboard.qml",
         "hyprtrack-summary.py": "hypr/custom/scripts/hyprtrack-summary.py",
