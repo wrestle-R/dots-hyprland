@@ -226,6 +226,11 @@ ColumnLayout {
         }
     }
 
+    InternetSwapControl {
+        Layout.fillWidth: true
+        active: root.active
+    }
+
     ColumnLayout {
         Layout.fillWidth: true
         spacing: 4

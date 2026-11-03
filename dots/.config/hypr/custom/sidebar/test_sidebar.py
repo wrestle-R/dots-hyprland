@@ -192,6 +192,25 @@ class InstallationTests(unittest.TestCase):
         self.assertEqual(updated.count(installer.SPOTIFY_HOOK), 1)
         self.assertEqual(installer.plan(self.root), [])
 
+    def test_internet_swap_startup_preserves_existing_collector(self):
+        execs = self.root / "hypr/custom/execs.lua"
+        execs.parent.mkdir(parents=True)
+        original = '-- existing collector\nhl.on("hyprland.start", function() hl.exec_cmd("collector") end)\n'
+        execs.write_text(original)
+        installer.install(self.root, self.backups)
+        self.assertTrue(execs.read_text().startswith(original))
+        self.assertEqual(execs.read_text().count(installer.SWAP_HOOK), 1)
+        self.assertTrue((self.root / "hypr/custom/scripts/internet-swap-start.sh").stat().st_mode & 0o111)
+        self.assertEqual(installer.plan(self.root), [])
+
+    def test_edited_internet_swap_startup_stops_before_writes(self):
+        execs = self.root / "hypr/custom/execs.lua"
+        execs.parent.mkdir(parents=True)
+        execs.write_text('-- Internet Swap autostart edited by user\n')
+        with self.assertRaises(installer.CompatibilityError):
+            installer.install(self.root, self.backups)
+        self.assertFalse(self.backups.exists())
+
     def test_partial_spotify_hook_stops_before_any_writes(self):
         keybinds = self.root / "hypr/custom/keybinds.lua"
         keybinds.parent.mkdir(parents=True)

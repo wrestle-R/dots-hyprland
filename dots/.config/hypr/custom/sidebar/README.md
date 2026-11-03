@@ -150,3 +150,7 @@ See [Spotify setup and recreation](SPOTIFY.md) for the download, browser sign-in
 Soloist pairing, exact installed files, upstream update procedure, rollback,
 screenshots with generic data and verification details. This is a personal
 Hyprland integration, with no changes to the Spotify-Tui source repository.
+
+## Internet Swap
+
+The compact Wi-Fi row below live traffic controls the separate Internet Swap daemon. See [INTERNET-SWAP.md](INTERNET-SWAP.md) for the local bridge, login startup and rebuild steps. HyprTrack’s passive traffic reader stays independent.

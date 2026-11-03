@@ -21,6 +21,14 @@ if is_file_exists(spotifyShortcuts) then dofile(spotifyShortcuts) end
 '''
 
 
+SWAP_HOOK = '''
+-- Internet Swap autostart (managed integration)
+hl.on("hyprland.start", function ()
+    hl.exec_cmd('"$HOME/.config/hypr/custom/scripts/internet-swap-start.sh"')
+end)
+'''
+
+
 class CompatibilityError(Exception):
     pass
 
@@ -68,6 +76,9 @@ def plan(config_root):
             raise CompatibilityError(f"Upstream integration changed in {relative}; no files were installed.")
         changes.append((path, old, edit["after"].encode()))
     assets = {
+        "InternetSwapControl.qml": "quickshell/ii/modules/ii/sidebarLeft/InternetSwapControl.qml",
+        "internet-swap-sidebar.py": "hypr/custom/scripts/internet-swap-sidebar.py",
+        "internet-swap-start.sh": "hypr/custom/scripts/internet-swap-start.sh",
         "hyprtrack-logo.svg": "quickshell/ii/modules/ii/sidebarLeft/hyprtrack-logo.svg",
         "SidebarToolTip.qml": "quickshell/ii/modules/ii/sidebarLeft/SidebarToolTip.qml",
         "HyprTrackSummary.qml": "quickshell/ii/modules/ii/sidebarLeft/HyprTrackSummary.qml",
@@ -98,8 +109,15 @@ def plan(config_root):
         settings_marker = "-- Local settings shortcuts (managed integration)"
         updated = text.replace(settings_marker, SPOTIFY_HOOK + "\n" + settings_marker, 1) if settings_marker in text else text + SPOTIFY_HOOK
         changes.append((keybinds, old, updated.encode()))
+    execs = config_root / "hypr/custom/execs.lua"
+    old = execs.read_bytes() if execs.exists() else None
+    text = old.decode() if old is not None else ""
+    if SWAP_HOOK not in text:
+        if "Internet Swap autostart" in text or "internet-swap-start.sh" in text:
+            raise CompatibilityError("Internet Swap startup hook was edited; installation stopped.")
+        changes.append((execs, old, (text + SWAP_HOOK).encode()))
     # Install dependencies before the watched entry point can load them.
-    return sorted(changes, key=lambda change: change[0].name in ("SidebarLeftContent.qml", "keybinds.lua"))
+    return sorted(changes, key=lambda change: change[0].name in ("SidebarLeftContent.qml", "keybinds.lua", "HyprTrackSummary.qml", "execs.lua"))
 
 
 def write_atomic(path, content, mode=None):
@@ -133,7 +151,7 @@ def install(config_root, backup_root):
     try:
         for path, old, new in changes:
             mode = path.stat().st_mode & 0o777 if path.exists() else None
-            write_atomic(path, new, 0o755 if path.name.endswith(".py") else mode)
+            write_atomic(path, new, 0o755 if path.name.endswith((".py", ".sh")) else mode)
             written.append((path, old, mode))
     except Exception:
         for path, old, mode in reversed(written):
