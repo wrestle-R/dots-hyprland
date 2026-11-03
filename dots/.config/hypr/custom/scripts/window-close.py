@@ -75,8 +75,20 @@ def hypr(command, *args, json_output=False):
     try:
         result = subprocess.run(argv, capture_output=True, text=True, timeout=4, check=True)
         return json.loads(result.stdout) if json_output else result.stdout.strip()
-    except (OSError, subprocess.SubprocessError, ValueError) as error:
-        raise CloseError("Could not communicate with Hyprland.") from error
+    except FileNotFoundError as error:
+        raise CloseError("Could not run hyprctl: executable not found in PATH.") from error
+    except subprocess.TimeoutExpired as error:
+        raise CloseError(f"Hyprland did not answer '{command}' within 4 seconds.") from error
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or error.stdout or "no error details").strip().splitlines()
+        detail = detail[0][:140] if detail else "no error details"
+        raise CloseError(f"Hyprland request '{command}' failed: {detail}") from error
+    except ValueError as error:
+        raise CloseError(f"Hyprland returned invalid data for '{command}'.") from error
+    except OSError as error:
+        raise CloseError(f"Could not run hyprctl: {error.strerror or error.__class__.__name__}.") from error
+    except subprocess.SubprocessError as error:
+        raise CloseError(f"Could not communicate with Hyprland for '{command}'.") from error
 
 
 def target_exists(target):
@@ -89,7 +101,7 @@ def target_exists(target):
 
 
 def window_id(window):
-    # hyprctl serializes stableId as hexadecimal; Lua exposes it as an integer.
+    # Both hyprctl JSON and Lua expose stableId as hexadecimal; convert in Lua before comparing.
     value = window.get("stableId", -1)
     return int(value, 16) if isinstance(value, str) else int(value)
 
@@ -321,7 +333,7 @@ def close_target(target):
     # Validation and dispatch run together in the compositor, avoiding address-reuse races.
     code = (
         f'local w = hl.get_window("address:{target["address"]}"); '
-        f'if not w or w.pid ~= {int(target["pid"])} or w.stable_id ~= {int(target["stableId"])} '
+        f'if not w or w.pid ~= {int(target["pid"])} or tonumber(w.stable_id, 16) ~= {int(target["stableId"])} '
         'then error("The selected window no longer exists") end; '
         'hl.dispatch(hl.dsp.window.close({window = w}))'
     )
