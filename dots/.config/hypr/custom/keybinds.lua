@@ -50,6 +50,9 @@ if is_file_exists(spotifyShortcuts) then dofile(spotifyShortcuts) end
 -- Prevent the standalone Super action from firing when Q was used.
 hl.bind("SUPER + Q", hl.dsp.global("quickshell:searchToggleReleaseInterrupt"), {non_consuming = true})
 
+-- Native Super tap override
+dofile((os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/super-tap.lua")
+
 -- Local settings shortcuts (managed integration)
 hl.unbind("SUPER + SHIFT + ALT + mouse:273") -- Unused AI text summary
 local settingsShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/settings-shortcuts.lua"

@@ -1,0 +1,7 @@
+{
+  "quickshell/ii/assets/image-states/failure.svg": "assets/failure.svg",
+  "quickshell/ii/assets/image-states/no-image.svg": "assets/no-image.svg",
+  "quickshell/ii/assets/image-states/unknown-app.svg": "assets/unknown-app.svg",
+  "quickshell/ii/assets/image-states/loading.svg": "assets/loading.svg",
+  "quickshell/ii/assets/image-states/offline.svg": "assets/offline.svg"
+}

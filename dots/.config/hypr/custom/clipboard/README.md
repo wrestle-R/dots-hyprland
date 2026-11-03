@@ -222,3 +222,10 @@ the dialog, initial Cancel focus, actual Escape/Enter cancellation, explicit
 confirmation clearing every history row while keeping pins, and disabling Clear
 when history is empty. The dialog was also rendered and visually checked. No
 personal history was cleared during setup or verification.
+
+## Super key lifecycle
+
+Use the custom `super-tap.lua` override for native Super-release handling.
+Clipboard closing cancels pending target capture, and clipboard/emoji toggles
+check their actual mode. Shared decoded image files are kept for the shell
+session by the image-states integration rather than deleted per preview.
