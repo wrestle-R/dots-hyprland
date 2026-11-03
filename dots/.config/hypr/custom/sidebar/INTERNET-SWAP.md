@@ -4,6 +4,8 @@ Internet Swap is a separate [Linux Wi-Fi companion](https://github.com/wrestle-R
 
 `internet-swap-sidebar.py` talks only to the daemon’s private local Unix socket. The bridge polls every two seconds while the sidebar is visible and stops when hidden. It never runs network tests itself. If the service is absent, the row says unavailable and leaves HyprTrack’s traffic reader working independently. No HyprTrack app or collector source changes are needed.
 
+The app has a narrow, centered 480 × 720 floating-window rule matching its observed `internet-swap` class. Existing window rules are preserved.
+
 The sidebar installer also appends a guarded `hyprland.start` hook to custom/execs.lua, preserving existing collectors and other startup entries. `internet-swap-start.sh` starts the installed user service, with an AppImage fallback. The daemon has an exclusive lock, so reopening the GUI or repeated startup calls don’t create duplicate monitors.
 
 ## Restore on a rebuilt desktop

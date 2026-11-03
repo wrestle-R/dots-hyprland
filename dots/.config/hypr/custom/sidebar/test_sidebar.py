@@ -211,6 +211,18 @@ class InstallationTests(unittest.TestCase):
             installer.install(self.root, self.backups)
         self.assertFalse(self.backups.exists())
 
+    def test_internet_swap_window_rule_preserves_existing_rules(self):
+        rules = self.root / "hypr/custom/rules.lua"
+        rules.parent.mkdir(parents=True)
+        original = '-- existing personal rules\n'
+        rules.write_text(original)
+        installer.install(self.root, self.backups)
+        self.assertEqual(rules.read_text(), original + installer.SWAP_RULE)
+        self.assertEqual(installer.plan(self.root), [])
+        rules.write_text(original + '-- Internet Swap window edited\n')
+        with self.assertRaises(installer.CompatibilityError):
+            installer.plan(self.root)
+
     def test_partial_spotify_hook_stops_before_any_writes(self):
         keybinds = self.root / "hypr/custom/keybinds.lua"
         keybinds.parent.mkdir(parents=True)

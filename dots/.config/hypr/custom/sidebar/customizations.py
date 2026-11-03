@@ -29,6 +29,17 @@ end)
 '''
 
 
+SWAP_RULE = '''
+-- Internet Swap window (managed integration)
+hl.window_rule({
+    match = {class = "^internet-swap$"},
+    float = true,
+    center = true,
+    size = {"480", "720"},
+})
+'''
+
+
 class CompatibilityError(Exception):
     pass
 
@@ -116,6 +127,13 @@ def plan(config_root):
         if "Internet Swap autostart" in text or "internet-swap-start.sh" in text:
             raise CompatibilityError("Internet Swap startup hook was edited; installation stopped.")
         changes.append((execs, old, (text + SWAP_HOOK).encode()))
+    rules = config_root / "hypr/custom/rules.lua"
+    old = rules.read_bytes() if rules.exists() else None
+    text = old.decode() if old is not None else ""
+    if SWAP_RULE not in text:
+        if "Internet Swap window" in text or "^internet-swap$" in text:
+            raise CompatibilityError("Internet Swap window rule was edited; installation stopped.")
+        changes.append((rules, old, (text + SWAP_RULE).encode()))
     # Install dependencies before the watched entry point can load them.
     return sorted(changes, key=lambda change: change[0].name in ("SidebarLeftContent.qml", "keybinds.lua", "HyprTrackSummary.qml", "execs.lua"))
 
