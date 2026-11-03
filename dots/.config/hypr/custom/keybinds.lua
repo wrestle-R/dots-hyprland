@@ -47,6 +47,9 @@ hl.bind("SUPER + W", hl.dsp.exec_cmd("zen-browser"), {description = "Zen Browser
 local spotifyShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/spotify-shortcuts.lua"
 if is_file_exists(spotifyShortcuts) then dofile(spotifyShortcuts) end
 
+-- Prevent the standalone Super action from firing when Q was used.
+hl.bind("SUPER + Q", hl.dsp.global("quickshell:searchToggleReleaseInterrupt"), {non_consuming = true})
+
 -- Local settings shortcuts (managed integration)
 hl.unbind("SUPER + SHIFT + ALT + mouse:273") -- Unused AI text summary
 local settingsShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/settings-shortcuts.lua"
