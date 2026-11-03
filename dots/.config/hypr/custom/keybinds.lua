@@ -15,14 +15,7 @@ hl.bind("SUPER + Space", hl.dsp.exec_cmd("$HOME/.local/bin/multi-codex.AppImage"
 hl.bind("mouse:274", hl.dsp.exec_cmd("ydotool key 29:1 15:1 15:0 && sleep 0.3 && ydotool key 29:0"), {mouse = true})
 
 hl.unbind("SUPER + Q")
-hl.bind("SUPER + Q", function()
-    local window = hl.get_active_window()
-    if not window then return end
-    hl.dispatch(hl.dsp.exec_cmd(string.format(
-        '"$HOME/.config/hypr/custom/scripts/confirm-close.sh" %s %d %d',
-        window.address, window.pid, window.stable_id
-    )))
-end, {description = "Confirm before closing"})
+hl.bind("SUPER + Q", hl.dsp.exec_cmd('"$HOME/.config/hypr/custom/scripts/confirm-close.sh"'), {description = "Confirm before closing"})
 
 hl.unbind("SUPER + SHIFT + Q")
 hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd('"$HOME/.config/hypr/custom/scripts/restore-closed.sh"'), {description = "Reopen last closed app"})
@@ -45,6 +38,16 @@ hl.bind("SUPER + H", hl.dsp.exec_cmd("~/.local/bin/hyprtrack-desktop.AppImage"))
 hl.unbind("SUPER + R")
 hl.bind("SUPER + R", hl.dsp.exec_cmd("env -u ELECTRON_RUN_AS_NODE GDK_BACKEND=x11 gtk-launch Cap"), {description = "Cap"})
 
+-- Preferred browser
+hl.unbind("SUPER + W")
+hl.bind("SUPER + W", hl.dsp.exec_cmd("zen-browser"), {description = "Zen Browser"})
+
+
 -- Spotify sidebar launcher (managed integration)
 local spotifyShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/spotify-shortcuts.lua"
 if is_file_exists(spotifyShortcuts) then dofile(spotifyShortcuts) end
+
+-- Local settings shortcuts (managed integration)
+hl.unbind("SUPER + SHIFT + ALT + mouse:273") -- Unused AI text summary
+local settingsShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/settings-shortcuts.lua"
+if is_file_exists(settingsShortcuts) then dofile(settingsShortcuts) end
