@@ -38,4 +38,6 @@ fi
     combined=result.stdout+result.stderr
     if 'STATE_TEST_PASS' not in combined or 'TEST_FAIL' in combined:
         print(combined[-8000:]);raise SystemExit(1)
+    preferences=json.loads((root/'state/quickshell/slumber.json').read_text())
+    assert set(preferences['allowedApps'])=={'t3code','codex','vscode'}, 'Preference changes did not persist'
     print('PASS: no DPMS before secure confirmation, protected lid state, hidden notification suppression, allowed wake, real six-second reblank, user interaction, unlock cleanup, lock-timeout fail-safe')

@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import "NotificationPolicy.js" as NotificationPolicy
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
@@ -21,13 +22,28 @@ Singleton {
     property double lastNotificationWake: 0
     property string error: ""
     property string lidAction: "sleep"
+    property list<string> allowedApps: []
     property list<string> hiddenApps: []
     readonly property string helper: Quickshell.shellPath("services/slumber_backend.py")
     readonly property string statePath: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/quickshell/slumber.json"
     property bool settingsOnly: Quickshell.shellPath("shell.qml").toString().indexOf("settings.qml") >= 0
     // Settings process persists preferences; only the main shell owns hardware.
     property bool hardwareOwner: false
-    function allowed(notification) { return notification && hiddenApps.indexOf(notification.appName) < 0; }
+    function allowed(notification) {
+        return ready && notification && NotificationPolicy.allows(notification.appName, allowedApps, hiddenApps);
+    }
+    function setAllowedApp(group, enabled) {
+        if (["t3code", "codex", "vscode"].indexOf(group) < 0) return;
+        let values = allowedApps.filter(value => value !== group);
+        if (enabled) values.push(group);
+        root.allowedApps = values;
+        settings.allowedApps = values;
+        if (enabled) {
+            root.hiddenApps = hiddenApps.filter(name => NotificationPolicy.groupFor(name) !== group);
+            settings.hiddenApps = root.hiddenApps;
+        }
+        state.writeAdapter();
+    }
     function setLidAction(value) {
         if (value !== "sleep" && value !== "slumber") return;
         settings.lidAction = value;
@@ -101,23 +117,49 @@ Singleton {
         path: root.statePath
         watchChanges: true
         onFileChanged: reload()
-        onLoaded: {
-            root.lidAction = settings.lidAction === "slumber" ? "slumber" : "sleep";
+        onSaved: {
+            root.allowedApps = settings.allowedApps.filter(value => ["t3code", "codex", "vscode"].indexOf(value) >= 0);
             root.hiddenApps = settings.hiddenApps;
+            root.lidAction = settings.lidAction === "slumber" ? "slumber" : "sleep";
             root.ready = true;
+        }
+        onSaveFailed: error => {
+            root.allowedApps = [];
+            root.ready = false;
+            root.error = "Could not save notification preferences; lockscreen notifications hidden";
+        }
+        onLoaded: {
+            try {
+                const stored = JSON.parse(state.text());
+                const values = stored.allowedApps === undefined ? ["t3code", "codex", "vscode"] : stored.allowedApps;
+                root.allowedApps = Array.isArray(values) ? values.filter(value => ["t3code", "codex", "vscode"].indexOf(value) >= 0) : [];
+                root.lidAction = settings.lidAction === "slumber" ? "slumber" : "sleep";
+                root.hiddenApps = settings.hiddenApps;
+                root.ready = true;
+                if (stored.allowedApps === undefined) state.writeAdapter();
+            } catch (e) {
+                root.allowedApps = [];
+                root.ready = false;
+                root.lidAction = "sleep";
+                root.error = "Cannot read notification preferences; lockscreen notifications hidden";
+            }
         }
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound) {
+                root.allowedApps = ["t3code", "codex", "vscode"];
                 root.ready = true;
                 state.writeAdapter();
             } else {
-                root.error = "Cannot read Slumber preferences; normal sleep retained";
+                root.error = "Cannot read Slumber preferences; lockscreen notifications hidden and normal sleep retained";
+                root.allowedApps = [];
+                root.ready = false;
                 root.lidAction = "sleep";
             }
         }
         adapter: JsonAdapter {
             id: settings
             property string lidAction: "sleep"
+            property list<string> allowedApps: ["t3code", "codex", "vscode"]
             property list<string> hiddenApps: []
         }
     }

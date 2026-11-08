@@ -111,6 +111,12 @@ def checkpoint(root,baseline,backup_root):
         after=f'{i}.after'
         write(saved/after,destination(root,item['path']).read_bytes(),0o600)
         records.append({'path':item['path'],'before':before,'after':after})
+    covered={item['path'] for item in records}
+    for relative in json.loads((HERE/'assets.json').read_text()):
+        if relative in covered: continue
+        after=f'{len(records)}.after'
+        write(saved/after,destination(root,relative).read_bytes(),0o600)
+        records.append({'path':relative,'before':None,'after':after})
     write(saved/'manifest.json',json.dumps({'root':str(root.resolve()),'files':records},indent=2).encode(),0o600)
     print('Combined rollback checkpoint:',saved)
 

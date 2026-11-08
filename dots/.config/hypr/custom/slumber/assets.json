@@ -1,4 +1,5 @@
 {
+  "quickshell/ii/services/NotificationPolicy.js": "NotificationPolicy.js",
   "quickshell/ii/services/Slumber.qml": "Slumber.qml",
   "quickshell/ii/services/ChargeLimit.qml": "ChargeLimit.qml",
   "quickshell/ii/services/slumber_backend.py": "slumber_backend.py",
