@@ -1,0 +1,10 @@
+{
+  "quickshell/ii/services/Slumber.qml": "Slumber.qml",
+  "quickshell/ii/services/ChargeLimit.qml": "ChargeLimit.qml",
+  "quickshell/ii/services/slumber_backend.py": "slumber_backend.py",
+  "quickshell/ii/modules/ii/sidebarRight/LidActionControl.qml": "LidActionControl.qml",
+  "quickshell/ii/modules/ii/sidebarRight/ChargeLimitControl.qml": "ChargeLimitControl.qml",
+  "quickshell/ii/modules/ii/lock/LockNotifications.qml": "LockNotifications.qml",
+  "quickshell/ii/modules/settings/NotificationsConfig.qml": "NotificationsConfig.qml",
+  "hypr/custom/slumber-shortcuts.lua": "slumber-shortcuts.lua"
+}

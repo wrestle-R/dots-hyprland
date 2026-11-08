@@ -1,0 +1,15 @@
+[Unit]
+Description=Restore hardware battery charge thresholds
+After=systemd-udev-settle.service
+ConditionPathExists=/var/lib/rdp-charge-limit/settings.json
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/rdp-charge-limit restore
+RemainAfterExit=yes
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

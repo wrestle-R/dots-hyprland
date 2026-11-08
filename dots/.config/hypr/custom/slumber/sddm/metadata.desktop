@@ -1,0 +1,12 @@
+[SddmGreeterTheme]
+Name=RDP Slumber
+Description=Wallpaper login with a neutral password panel
+Author=rdp
+License=MIT
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=rdp-slumber
+Theme-API=2.0
+QtVersion=6
