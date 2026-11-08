@@ -1,0 +1,5 @@
+Good software should make ordinary work easier.
+Keep each line in the order shown on the screen.
+
+A new paragraph starts after this blank line.
+Numbers: 1360, 95%, 16 GB, and 2026.

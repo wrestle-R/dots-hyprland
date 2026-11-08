@@ -1,0 +1,3 @@
+The quick brown fox jumps over the lazy dog.
+Please keep the original words and punctuation.
+Local screenshots stay on this computer.

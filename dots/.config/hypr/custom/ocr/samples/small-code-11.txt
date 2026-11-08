@@ -1,0 +1,7 @@
+def greet(name):
+    if name:
+        print("Hello, " + name)
+    else:
+        return None
+
+result = greet("Alex")

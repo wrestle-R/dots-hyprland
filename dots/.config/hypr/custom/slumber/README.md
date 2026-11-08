@@ -1,6 +1,6 @@
 # Slumber, lock notifications and charge limits
 
-Slumber locks using the existing QuickShell PAM/session-lock implementation, shows the lockscreen for two seconds, then switches displays off while apps continue working. Use **Super+Ctrl+L**, **Slumber now** in the notification panel, or the Session menu. **Super+L** still locks; **Super+Shift+L** still sleeps.
+Slumber locks using the existing QuickShell PAM/session-lock implementation, shows the lockscreen for two seconds, then switches displays off while apps continue working. Use **Super+Ctrl+L**, the notification-panel **play button**, or the Session menu. **Super+L** still locks; **Super+Shift+L** still sleeps.
 
 The notification panel has a saved **Lid action: Sleep / Slumber** choice. Selecting a lid action changes future lid handling; Slumber now enters it immediately. Active Slumber keeps work running with either lid position until password unlock. It skips the normal 15-minute idle suspend, without blocking explicit sleep or critical-battery suspend. The coffee control retains its existing idle-inhibition role.
 
@@ -86,4 +86,4 @@ Keep Breeze installed as a recovery theme. If the new login theme fails after a 
 
 `test_guardrails.py` uses only temporary files and fake sysfs: install/restore/idempotency, unknown-file rejection, partial-write rollback, concurrent-edit refusal, charge apply/off and persistence-failure rollback. Native isolated checks and live deployment results are recorded separately in `VERIFICATION.md`; unperformed physical/reboot checks must remain identified there.
 
-Combined rollback for the final live layer: `python3 customizations.py restore --backup /home/rdp/.local/state/hypr-slumber-backups/rollback-54t1mryp --config-root /home/rdp/.config`. This returns all managed user-config files to their pre-feature versions in one checked transaction. System theme/helper rollback remains separate as described above.
+Combined rollback for the final live layer: `python3 customizations.py restore --backup /home/rdp/.local/state/hypr-slumber-backups/rollback-215127n0 --config-root /home/rdp/.config`. This returns all managed user-config files to their pre-feature versions in one checked transaction. System theme/helper rollback remains separate as described above.

@@ -5,53 +5,50 @@ import qs.modules.common
 import qs.modules.common.widgets
 
 Rectangle {
-    id: root
-    implicitHeight: 130
+    implicitHeight: 120
     implicitWidth: 430
     radius: Appearance.rounding.normal
     color: Appearance.colors.colLayer1
+    border.width: 1; border.color: Appearance.colors.colLayer2
     ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 14
-        spacing: 12
+        anchors.fill: parent; anchors.margins: 14; spacing: 12
         RowLayout {
-            Layout.fillWidth: true
-            spacing: 9
-            MaterialSymbol { text: "desktop_windows"; iconSize: 22; color: Appearance.colors.colOnLayer0 }
-            ColumnLayout {
-                Layout.fillWidth: true
+            Layout.fillWidth: true; spacing: 10
+            MaterialSymbol { text: "dark_mode"; iconSize: 24; color: Appearance.colors.colOnLayer0 }
+            Column {
                 spacing: 3
-                StyledText { text: "Slumber"; font.pixelSize: 14; font.bold: true }
-                StyledText { text: "Screen off. Work keeps going."; font.pixelSize: 11; color: Appearance.colors.colSubtext }
+                StyledText { text: "Slumber"; font.pixelSize: Appearance.font.pixelSize.small }
+                StyledText { text: "Screen off. Work keeps going."; font.pixelSize: Appearance.font.pixelSize.smaller; color: Appearance.colors.colSubtext }
             }
+            Item { Layout.fillWidth: true; Layout.minimumWidth: 8 }
             RippleButton {
-                implicitWidth: 96; implicitHeight: 34; buttonRadius: 17
-                colBackground: Appearance.colors.colPrimary
-                colBackgroundHover: Appearance.colors.colPrimaryHover
+                text: "Start Slumber now"
+                Layout.preferredWidth: 40; Layout.preferredHeight: 36
+                buttonRadius: 18
+                colBackground: Appearance.colors.colPrimary; colBackgroundHover: Appearance.colors.colPrimaryHover
                 onClicked: Slumber.enter()
-                contentItem: StyledText { text: "Start now"; font.pixelSize: 12; color: Appearance.colors.colOnPrimary; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                contentItem: MaterialSymbol { text: "play_arrow"; iconSize: 24; color: Appearance.colors.colOnPrimary; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                StyledToolTip { text: "Start Slumber now · Super+Ctrl+L" }
             }
         }
         Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Appearance.colors.colLayer2 }
         RowLayout {
             Layout.fillWidth: true
-            StyledText { Layout.fillWidth: true; text: "When lid closes"; font.pixelSize: 12 }
+            StyledText { text: "On lid close"; font.pixelSize: Appearance.font.pixelSize.smallie }
+            Item { Layout.fillWidth: true }
             Rectangle {
-                implicitWidth: 176; implicitHeight: 36; radius: 18; color: Appearance.colors.colLayer0
+                Layout.preferredWidth: 174; Layout.preferredHeight: 32; radius: 16; color: Appearance.colors.colLayer0
                 RowLayout {
-                    anchors.fill: parent; anchors.margins: 3; spacing: 3
+                    anchors.fill: parent; anchors.margins: 2; spacing: 2
                     Repeater {
                         model: [{label:"Sleep",value:"sleep"},{label:"Slumber",value:"slumber"}]
                         delegate: RippleButton {
                             id: modeButton
                             required property var modelData
                             Layout.fillWidth: true; Layout.fillHeight: true
-                            buttonRadius: 16
-                            toggled: Slumber.lidAction === modelData.value
-                            colBackground: "transparent"
+                            buttonRadius: 15; toggled: Slumber.lidAction === modelData.value; colBackground: "transparent"
                             onClicked: Slumber.setLidAction(modelData.value)
-                            contentItem: StyledText { text: modeButton.modelData.label; font.pixelSize: 11; color: modeButton.toggled ? Appearance.colors.colOnPrimary : Appearance.colors.colOnLayer0; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-                            StyledToolTip { text: modeButton.modelData.value === "slumber" ? "Keep work running with the lid closed" : "Suspend when the lid closes" }
+                            contentItem: StyledText { text: modeButton.modelData.label; font.pixelSize: Appearance.font.pixelSize.smaller; color: modeButton.toggled ? Appearance.colors.colOnPrimary : Appearance.colors.colOnLayer0; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                         }
                     }
                 }

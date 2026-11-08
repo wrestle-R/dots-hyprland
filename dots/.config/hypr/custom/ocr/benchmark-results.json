@@ -1,0 +1,714 @@
+[
+  {
+    "sample": {
+      "name": "light-sans-18",
+      "width": 455,
+      "height": 121,
+      "font": "NotoSans-Regular.ttf",
+      "size": 18
+    },
+    "tesseract": {
+      "median_seconds": 0.26574823999999353,
+      "runs_seconds": [
+        0.26574823999999353,
+        0.25219206000019767,
+        0.270025085999805
+      ],
+      "max_rss_kib": 118756,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.7738872099998844,
+      "runs_seconds": [
+        0.7508895679998204,
+        0.845048456999848,
+        0.7738872099998844
+      ],
+      "max_rss_kib": 205504,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "dark-sans-16",
+      "width": 410,
+      "height": 115,
+      "font": "NotoSans-Regular.ttf",
+      "size": 16
+    },
+    "tesseract": {
+      "median_seconds": 0.507964572000219,
+      "runs_seconds": [
+        0.4756165979997604,
+        0.5691783840002245,
+        0.507964572000219
+      ],
+      "max_rss_kib": 118808,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.8419577239997125,
+      "runs_seconds": [
+        0.9453090270003486,
+        0.8419577239997125,
+        0.8033751530001609
+      ],
+      "max_rss_kib": 205572,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "small-light-10",
+      "width": 274,
+      "height": 88,
+      "font": "NotoSans-Regular.ttf",
+      "size": 10
+    },
+    "tesseract": {
+      "median_seconds": 0.32247693499994057,
+      "runs_seconds": [
+        0.34741603400016174,
+        0.32247693499994057,
+        0.3057772130000558
+      ],
+      "max_rss_kib": 118792,
+      "character_errors": 4,
+      "characters": 112,
+      "cer": 0.03571428571428571,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown foxjumps over the lazy dog.\nPlease keep the oiginal words and punctuation.\nLocal screenshots sty onthis computet:\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.6952235989997462,
+      "runs_seconds": [
+        0.6869957549997707,
+        0.6952235989997462,
+        0.7315302209999572
+      ],
+      "max_rss_kib": 190360,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "small-dark-11",
+      "width": 297,
+      "height": 91,
+      "font": "NotoSans-Regular.ttf",
+      "size": 11
+    },
+    "tesseract": {
+      "median_seconds": 0.365568379999786,
+      "runs_seconds": [
+        0.37531170000011116,
+        0.365568379999786,
+        0.3482765759999893
+      ],
+      "max_rss_kib": 118768,
+      "character_errors": 3,
+      "characters": 112,
+      "cer": 0.026785714285714284,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "\u201cThe quick brown fox jumps ver the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.682255823000105,
+      "runs_seconds": [
+        0.6767137299998467,
+        0.682255823000105,
+        0.7187866510003005
+      ],
+      "max_rss_kib": 205224,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "serif-paragraph-17",
+      "width": 452,
+      "height": 170,
+      "font": "NotoSerif-Regular.ttf",
+      "size": 17
+    },
+    "tesseract": {
+      "median_seconds": 0.3580330619997767,
+      "runs_seconds": [
+        0.36037328500015064,
+        0.348251160000018,
+        0.3580330619997767
+      ],
+      "max_rss_kib": 118752,
+      "character_errors": 0,
+      "characters": 148,
+      "cer": 0.0,
+      "line_count": 5,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "Good software should make ordinary work easier.\nKeep each line in the order shown on the screen.\n\nAnew paragraph starts after this blank line.\nNumbers: 1360, 95%, 16 GB, and 2026.\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.7944962679998753,
+      "runs_seconds": [
+        0.8029663339998478,
+        0.7548375279998254,
+        0.7944962679998753
+      ],
+      "max_rss_kib": 223564,
+      "character_errors": 0,
+      "characters": 148,
+      "cer": 0.0,
+      "line_count": 5,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "Good software should make ordinary work easier.\nKeep each line in the order shown on the screen.\n\nA new paragraph starts after this blank line.\nNumbers: 1360, 95%, 16 GB, and 2026.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "sans-paragraph-14",
+      "width": 373,
+      "height": 150,
+      "font": "NotoSans-Regular.ttf",
+      "size": 14
+    },
+    "tesseract": {
+      "median_seconds": 0.35998509099999865,
+      "runs_seconds": [
+        0.35446219100003873,
+        0.35998509099999865,
+        0.367600054000377
+      ],
+      "max_rss_kib": 118724,
+      "character_errors": 0,
+      "characters": 148,
+      "cer": 0.0,
+      "line_count": 5,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "Good software should make ordinary work easier.\nKeep each line in the order shown on the screen.\n\nA new paragraph starts after this blank line.\nNumbers: 1360, 95%, 16 GB, and 2026.\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.7679433549997157,
+      "runs_seconds": [
+        0.7679433549997157,
+        0.7688807889999225,
+        0.7541421139999329
+      ],
+      "max_rss_kib": 219004,
+      "character_errors": 0,
+      "characters": 148,
+      "cer": 0.0,
+      "line_count": 5,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "Good software should make ordinary work easier.\nKeep each line in the order shown on the screen.\n\nA new paragraph starts after this blank line.\nNumbers: 1360, 95%, 16 GB, and 2026.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "mono-code-15",
+      "width": 327,
+      "height": 201,
+      "font": "NotoSansMono-Regular.ttf",
+      "size": 15
+    },
+    "tesseract": {
+      "median_seconds": 0.25852080300001035,
+      "runs_seconds": [
+        0.23998796900013986,
+        0.2677374259997123,
+        0.25852080300001035
+      ],
+      "max_rss_kib": 118712,
+      "character_errors": 5,
+      "characters": 77,
+      "cer": 0.06493506493506493,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "def greet(name)\nif name\nprint(\u201cHello, \" + name)\nelse\nreturn None\n\nresult = greet(\"Alex\u201d)\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.7445972779996737,
+      "runs_seconds": [
+        0.7445972779996737,
+        0.7440129470001011,
+        0.7759437210002034
+      ],
+      "max_rss_kib": 216108,
+      "character_errors": 0,
+      "characters": 77,
+      "cer": 0.0,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        4,
+        8,
+        4,
+        8,
+        0
+      ],
+      "text": "def greet(name):\n    if name:\n        print(\"Hello, \" + name)\n    else:\n        return None\n\nresult = greet(\"Alex\")\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "dark-code-14",
+      "width": 308,
+      "height": 194,
+      "font": "NotoSansMono-Regular.ttf",
+      "size": 14
+    },
+    "tesseract": {
+      "median_seconds": 0.334403342999849,
+      "runs_seconds": [
+        0.347198939000009,
+        0.32016033600029914,
+        0.334403342999849
+      ],
+      "max_rss_kib": 118524,
+      "character_errors": 3,
+      "characters": 77,
+      "cer": 0.03896103896103896,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "def greet (name):\nif name:\nprint(\"Hello, \" + name)\nelse:\nTeturn None\n\nTesult = greet(\"Alex\"\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.7493327180000051,
+      "runs_seconds": [
+        0.7633042649999879,
+        0.7493327180000051,
+        0.7423912640001618
+      ],
+      "max_rss_kib": 222800,
+      "character_errors": 0,
+      "characters": 77,
+      "cer": 0.0,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        4,
+        8,
+        4,
+        8,
+        0
+      ],
+      "text": "def greet(name):\n    if name:\n        print(\"Hello, \" + name)\n    else:\n        return None\n\nresult = greet(\"Alex\")\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "small-code-11",
+      "width": 252,
+      "height": 166,
+      "font": "NotoSansMono-Regular.ttf",
+      "size": 11
+    },
+    "tesseract": {
+      "median_seconds": 0.31364992099997835,
+      "runs_seconds": [
+        0.28923565400009466,
+        0.31927546899987647,
+        0.31364992099997835
+      ],
+      "max_rss_kib": 118744,
+      "character_errors": 8,
+      "characters": 77,
+      "cer": 0.1038961038961039,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "def greet(nane)\nif nane\nprint(*Hello, * + name)\nelse\nreturn None\n\nresult = greet(\"Alex\u201d)\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.70898774699981,
+      "runs_seconds": [
+        0.70898774699981,
+        0.7088899780001157,
+        0.7843082300000788
+      ],
+      "max_rss_kib": 210160,
+      "character_errors": 0,
+      "characters": 77,
+      "cer": 0.0,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        4,
+        8,
+        4,
+        8,
+        0
+      ],
+      "text": "def greet(name) :\n    if name:\n        print(\"Hello, \" + name)\n    else:\n        return None\n\nresult = greet(\"Alex\")\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "low-contrast-14",
+      "width": 365,
+      "height": 106,
+      "font": "NotoSans-Regular.ttf",
+      "size": 14
+    },
+    "tesseract": {
+      "median_seconds": 0.3567741530000603,
+      "runs_seconds": [
+        0.36019049200012887,
+        0.3267371550000462,
+        0.3567741530000603
+      ],
+      "max_rss_kib": 118680,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.7617136300000311,
+      "runs_seconds": [
+        0.7628683029997774,
+        0.751658013999986,
+        0.7617136300000311
+      ],
+      "max_rss_kib": 195896,
+      "character_errors": 1,
+      "characters": 112,
+      "cer": 0.008928571428571428,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer:\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "single-line-13",
+      "width": 358,
+      "height": 59,
+      "font": "NotoSans-Regular.ttf",
+      "size": 13
+    },
+    "tesseract": {
+      "median_seconds": 0.22239691799995853,
+      "runs_seconds": [
+        0.22239691799995853,
+        0.22264414200026295,
+        0.22160938600018198
+      ],
+      "max_rss_kib": 118736,
+      "character_errors": 0,
+      "characters": 43,
+      "cer": 0.0,
+      "line_count": 1,
+      "blank_lines": 0,
+      "indentation": [
+        0
+      ],
+      "text": "Settings > Notifications: show sender and message\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.6362846520000858,
+      "runs_seconds": [
+        0.618048866999743,
+        0.6362846520000858,
+        0.6421141340001668
+      ],
+      "max_rss_kib": 168624,
+      "character_errors": 0,
+      "characters": 43,
+      "cer": 0.0,
+      "line_count": 1,
+      "blank_lines": 0,
+      "indentation": [
+        0
+      ],
+      "text": "Settings > Notifications: show sender and message\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "mono-paragraph-13",
+      "width": 422,
+      "height": 145,
+      "font": "NotoSansMono-Regular.ttf",
+      "size": 13
+    },
+    "tesseract": {
+      "median_seconds": 0.3136296659999971,
+      "runs_seconds": [
+        0.3256931349997103,
+        0.3136296659999971,
+        0.30010437800001455
+      ],
+      "max_rss_kib": 118744,
+      "character_errors": 2,
+      "characters": 148,
+      "cer": 0.013513513513513514,
+      "line_count": 5,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "Good software should make ordinary work easier.\nKeep each line in the order shown on the screen.\n\nA new paragraph starts after this blank line.\nNunbers: 1360, 95%, 16 G8, and 2026.\n\n"
+    },
+    "rapidocr": {
+      "median_seconds": 0.8786606630001188,
+      "runs_seconds": [
+        0.8786606630001188,
+        0.9125676190001286,
+        0.8659800690002157
+      ],
+      "max_rss_kib": 233164,
+      "character_errors": 0,
+      "characters": 148,
+      "cer": 0.0,
+      "line_count": 5,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "Good software should make ordinary work easier.\nKeep each line in the order shown on the screen.\n\nA new paragraph starts after this blank line.\nNumbers: 1360, 95%, 16 GB, and 2026.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "native-light-14",
+      "width": 949,
+      "height": 1148,
+      "font": "Google Sans Flex",
+      "size": 14
+    },
+    "tesseract": {
+      "median_seconds": 0.44665387900022324,
+      "runs_seconds": [
+        0.43731008099985047,
+        0.46465400199986107,
+        0.44665387900022324
+      ],
+      "max_rss_kib": 118740,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 4,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\n\nLocal screenshots stay on this computer.\n"
+    },
+    "rapidocr": {
+      "median_seconds": 1.0553057020001688,
+      "runs_seconds": [
+        1.0553057020001688,
+        1.1127311559998816,
+        1.0101205569999365
+      ],
+      "max_rss_kib": 364456,
+      "character_errors": 0,
+      "characters": 112,
+      "cer": 0.0,
+      "line_count": 3,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        0,
+        0
+      ],
+      "text": "The quick brown fox jumps over the lazy dog.\nPlease keep the original words and punctuation.\nLocal screenshots stay on this computer.\n"
+    }
+  },
+  {
+    "sample": {
+      "name": "native-dark-code-14",
+      "width": 949,
+      "height": 1148,
+      "font": "JetBrains Mono NF",
+      "size": 14
+    },
+    "tesseract": {
+      "median_seconds": 0.4561873010002273,
+      "runs_seconds": [
+        0.4396773809999104,
+        0.48215181299974574,
+        0.4561873010002273
+      ],
+      "max_rss_kib": 118716,
+      "character_errors": 0,
+      "characters": 77,
+      "cer": 0.0,
+      "line_count": 7,
+      "blank_lines": 1,
+      "indentation": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "text": "def greet(name):\nif name:\nprint(\"Hello, \" + name)\nelse:\nreturn None\n\nresult = greet(\"Alex\")\n"
+    },
+    "rapidocr": {
+      "median_seconds": 1.0807629350001662,
+      "runs_seconds": [
+        1.0807629350001662,
+        1.0727891860001364,
+        1.1486339180000869
+      ],
+      "max_rss_kib": 364428,
+      "character_errors": 1,
+      "characters": 77,
+      "cer": 0.012987012987012988,
+      "line_count": 6,
+      "blank_lines": 0,
+      "indentation": [
+        0,
+        4,
+        8,
+        4,
+        8,
+        0
+      ],
+      "text": "def greet(name):\n    if name:\n        print(\"Hello,  + name)\n    else:\n        return None\nresult = greet(\"Alex\")\n"
+    }
+  }
+]

@@ -1,0 +1,21 @@
+#!/usr/bin/python3
+"""Small stdlib launcher. OCR dependencies stay in the isolated Python3.12 environment."""
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+python=Path.home()/'.local/share/rdp-screen-ocr/venv/bin/python'
+# Installed in hypr/custom/scripts; source copy can run directly for benchmarking.
+local=Path(__file__).resolve().parent/'ocr.py'
+helper=local if local.is_file() else Path(__file__).resolve().parents[1]/'ocr/ocr.py'
+if not python.is_file() or not helper.is_file():
+    subprocess.run(['notify-send','-a','Screen OCR','OCR unavailable','Run the documented OCR setup. Clipboard was left unchanged.'])
+    # An explicit delete flag denotes the caller's disposable capture.
+    if '--delete-input' in sys.argv and '--image' in sys.argv:
+        try:
+            capture=Path(sys.argv[sys.argv.index('--image')+1])
+            if capture.is_file() and not capture.is_symlink() and capture.stat().st_uid==os.getuid():capture.unlink()
+        except (OSError,IndexError):pass
+    raise SystemExit(1)
+os.execv(str(python),[str(python),str(helper),*sys.argv[1:]])

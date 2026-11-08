@@ -1,0 +1,6 @@
+{
+  "hypr/custom/ocr/ocr.py": "ocr.py",
+  "hypr/custom/ocr/layout.py": "layout.py",
+  "hypr/custom/ocr/models.json": "models.json",
+  "hypr/custom/scripts/screen-ocr": "screen-ocr"
+}
