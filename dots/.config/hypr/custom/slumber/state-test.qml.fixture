@@ -1,0 +1,19 @@
+//@ pragma UseQApplication
+import QtQuick
+import Quickshell
+import qs
+import qs.services
+ShellRoot {
+    property bool bootReady: Slumber.ready
+    function check(value, message) { if (!value) { console.error("TEST_FAIL",message); Qt.quit(); } }
+    Timer { interval:500; running:true; onTriggered:{ check(Slumber.ready,"preferences ready"); Slumber.hardwareOwner=true; Slumber.enter(); } }
+    Timer { interval:900; running:true; onTriggered:{ check(Slumber.active && !Slumber.dark,"never blanks before secure lock"); Slumber.lockSecure=true; } }
+    Timer { interval:1900; running:true; onTriggered:{ Slumber.interact(); check(!Slumber.dark && Slumber.intro,"intro lasts two seconds and ignores initial pointer activity"); } }
+    Timer { interval:3200; running:true; onTriggered:{ check(Slumber.dark && Slumber.lidReady,"blank after lock and lid protection"); Slumber.hiddenApps=["Hidden"]; Notifications.notify({appName:"Hidden"}); } }
+    Timer { interval:3400; running:true; onTriggered:{ check(Slumber.dark,"hidden notification never wakes"); Notifications.notify({appName:"Messages"}); } }
+    Timer { interval:3800; running:true; onTriggered:check(!Slumber.dark,"allowed notification wakes") }
+    Timer { interval:10000; running:true; onTriggered:{ check(Slumber.dark,"notification reblank after six seconds"); Slumber.interact(); } }
+    Timer { interval:10400; running:true; onTriggered:{ check(!Slumber.dark,"user interaction wakes"); GlobalStates.screenLocked=false; } }
+    Timer { interval:11000; running:true; onTriggered:{ check(!Slumber.active && !Slumber.lidReady,"unlock clears active state and lid override"); Slumber.lockSecure=false; Slumber.enter(); } }
+    Timer { interval:17500; running:true; onTriggered:{ check(!Slumber.active && !Slumber.wantsDark && GlobalStates.screenLocked,"failed secure confirmation retains lock and normal power policy"); console.log("STATE_TEST_PASS"); Qt.quit(); } }
+}

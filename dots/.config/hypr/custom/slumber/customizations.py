@@ -3,6 +3,7 @@
 import argparse
 from datetime import datetime, timezone
 import json
+import hashlib
 import os
 from pathlib import Path
 import tempfile
@@ -21,11 +22,12 @@ def destination(root, relative):
 
 def plan(root):
     changes=[]
+    versions=json.loads((HERE/'asset-versions.json').read_text()) if (HERE/'asset-versions.json').exists() else {}
     # Assets first, watched consumers next, shell entry point last.
     for relative,asset in json.loads((HERE/'assets.json').read_text()).items():
         path=destination(root,relative); old=path.read_bytes() if path.exists() else None; new=(HERE/asset).read_bytes()
         if old==new: continue
-        if old is not None: raise RuntimeError(f'Changed custom asset; review required: {path}')
+        if old is not None and hashlib.sha256(old).hexdigest() not in versions.get(relative,[]): raise RuntimeError(f'Changed custom asset; review required: {path}')
         changes.append((path,old,new))
     for item in sorted(json.loads((HERE/'integration.json').read_text()),key=lambda x:x['path']=='quickshell/ii/shell.qml'):
         path=destination(root,item['path']); old=path.read_bytes()
@@ -96,15 +98,35 @@ def restore(root,saved):
     print(f'Restored {len(changes)} files')
 
 
+def checkpoint(root,baseline,backup_root):
+    if plan(root): raise RuntimeError('Install latest package before taking rollback checkpoint')
+    manifest=json.loads((baseline/'manifest.json').read_text())
+    if manifest['root']!=str(root.resolve()): raise RuntimeError('Baseline belongs to another config root')
+    backup_root.mkdir(parents=True,exist_ok=True,mode=0o700)
+    saved=Path(tempfile.mkdtemp(prefix='rollback-',dir=backup_root));saved.chmod(0o700)
+    records=[]
+    for i,item in enumerate(manifest['files']):
+        before=f'{i}.before' if item['before'] else None
+        if before: write(saved/before,(baseline/item['before']).read_bytes(),0o600)
+        after=f'{i}.after'
+        write(saved/after,destination(root,item['path']).read_bytes(),0o600)
+        records.append({'path':item['path'],'before':before,'after':after})
+    write(saved/'manifest.json',json.dumps({'root':str(root.resolve()),'files':records},indent=2).encode(),0o600)
+    print('Combined rollback checkpoint:',saved)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action',choices=['check','install','restore'])
+    parser.add_argument('action',choices=['check','install','restore','checkpoint'])
     parser.add_argument('--config-root',type=Path,default=Path.home()/'.config')
     parser.add_argument('--backup',type=Path)
     parser.add_argument('--backup-root',type=Path,default=Path.home()/'.local/state/hypr-slumber-backups')
     args=parser.parse_args();root=args.config_root.resolve()
     if args.action=='check': print(f'Compatible: {len(plan(root))} changes')
     elif args.action=='install': install(root,args.backup_root)
+    elif args.action=='checkpoint':
+        if not args.backup: parser.error('checkpoint requires --backup BASELINE')
+        checkpoint(root,args.backup,args.backup_root)
     else:
         if not args.backup: parser.error('restore requires --backup')
         restore(root,args.backup)

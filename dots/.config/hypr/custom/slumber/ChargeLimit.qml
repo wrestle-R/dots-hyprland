@@ -32,11 +32,15 @@ Singleton {
     }
     Process {
         id: setter
-        stdout: StdioCollector {}
+        stdout: StdioCollector { id: resultOutput }
         stderr: StdioCollector {}
         onExited: (code, status) => {
             root.refresh();
-            if (code !== 0) root.error = "Charge limit was not changed. Authentication may have been cancelled; previous limits retained.";
+            if (code !== 0) {
+                let detail = "Authentication cancelled or helper unavailable.";
+                try { detail = JSON.parse(resultOutput.text).error || detail; } catch (e) {}
+                root.error = "Charge change failed. " + detail + " Check the actual limit above.";
+            }
         }
     }
 }

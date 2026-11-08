@@ -25,7 +25,7 @@ Rectangle {
     Image { id: wallpaper; anchors.fill: parent; source: "wallpaper.jpg"; fillMode: Image.PreserveAspectCrop }
     MultiEffect { anchors.fill: wallpaper; source: wallpaper; blurEnabled: true; blurMax: 12; blur: root.entryBlur; visible: root.entryBlur > 0.01 }
     Rectangle { anchors.fill: parent; gradient: Gradient { GradientStop { position: 0; color: "#00000000" } GradientStop { position: 1; color: "#8c06101e" } } }
-    Text { anchors { left: parent.left; top: parent.top; margins: 44 }; text: "WELCOME BACK"; color: "#243341"; font.pixelSize: 18; font.letterSpacing: 4 }
+    Text { anchors { left: parent.left; top: parent.top; margins: 44 } text: "WELCOME BACK"; color: "#243341"; font.pixelSize: 18; font.letterSpacing: 4 }
     Column {
         anchors { right: parent.right; top: parent.top; margins: 55 }
         property date now: new Date()

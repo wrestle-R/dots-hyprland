@@ -57,7 +57,7 @@ def plan(config_root):
             text = old.decode()
         except (OSError, UnicodeError) as error:
             raise CompatibilityError(f"Required integration file missing or unreadable: {relative}") from error
-        if text == edit["after"]:
+        if text == edit["after"] or text in edit.get("compatible", []):
             continue
         if text not in [edit["before"], *edit.get("previous", [])]:
             raise CompatibilityError(f"Upstream integration changed in {relative}; no files were installed.")

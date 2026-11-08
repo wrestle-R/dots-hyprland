@@ -1,0 +1,30 @@
+{
+  "quickshell/ii/services/Slumber.qml": [
+    "3178d3203e372b3224992a16eabd80ec1228e23e7833be34d74f847085a1eb2f",
+    "16763666571b6ddb99c78e32dc858dce183b1f93611e7daee7848d9ab397ba0b"
+  ],
+  "quickshell/ii/services/ChargeLimit.qml": [
+    "162b0390a628bca7c80fcf0cd73b8ef1a2bb5871bec654c3692f9d5dc8bb222e",
+    "992e96aa6eb76bd38b01af5d1e42ad4af86f18467bd8c2ec8e98c6bd81e788a5"
+  ],
+  "quickshell/ii/modules/ii/sidebarRight/LidActionControl.qml": [
+    "6f6ec85f1ec4ae5ae2e971fc7f41c1885fa7cff5967e04030e08d4f24ee383bc",
+    "d7047c0b43d55a4198f77e2ef10860e33b89ba4a440e38961e6c1436552295e4"
+  ],
+  "quickshell/ii/modules/ii/lock/LockNotifications.qml": [
+    "ee892a30604811f6fac75b6b848d146bc7b208749daa3ecf7420c7c9860d49fe",
+    "6250530e6d9f5c4f8e50f6410b05769863987685b4158cad8e75d17d6e604acd"
+  ],
+  "quickshell/ii/services/slumber_backend.py": [
+    "75f58ab962c219d012896575ce50e34895ed7b40ab2626408ce2f8ac19d918d7"
+  ],
+  "quickshell/ii/modules/ii/sidebarRight/ChargeLimitControl.qml": [
+    "5e9cb83d708a966f494807590e1f45971e8735795b46c9e35d742336d1638f14"
+  ],
+  "quickshell/ii/modules/settings/NotificationsConfig.qml": [
+    "686291e5d1e41bd852b9c2be509ee81f0cc184c7f13941f86068439645b6ab88"
+  ],
+  "hypr/custom/slumber-shortcuts.lua": [
+    "0f55f527207ef07ea4942e4aaabf826cc1259fb8cc8a48ed9bddbca03563fed1"
+  ]
+}

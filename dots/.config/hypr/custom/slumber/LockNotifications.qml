@@ -6,6 +6,9 @@ import qs.modules.common.widgets
 
 Rectangle {
     id: root
+    opacity: 0
+    Component.onCompleted: opacity = 1
+    Behavior on opacity { NumberAnimation { duration: 300 } }
     property var entries: Notifications.list.filter(n => Slumber.allowed(n)).slice().sort((a,b) => b.time-a.time)
     implicitWidth: Math.min(560, parent.width - 40)
     implicitHeight: content.implicitHeight + 28

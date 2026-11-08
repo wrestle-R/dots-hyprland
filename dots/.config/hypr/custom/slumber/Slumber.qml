@@ -11,6 +11,7 @@ Singleton {
     id: root
     property bool ready: false
     property bool active: false
+    property bool intro: false
     property bool lockSecure: false
     property bool lidReady: false
     property bool lidClosed: false
@@ -54,6 +55,8 @@ Singleton {
             return;
         }
         error = "";
+        if (!lidReady) lidClosed = false;
+        intro = true;
         active = true;
         GlobalStates.sidebarRightOpen = false;
         GlobalStates.sessionOpen = false;
@@ -65,10 +68,11 @@ Singleton {
         if (!active || !lockSecure || !lidReady) return;
         lockTimeout.stop();
         // Let the initiating shortcut/mouse release finish before DPMS off.
-        blankTimer.interval = 700;
+        blankTimer.interval = 2000;
         blankTimer.restart();
     }
     function leave() {
+        intro = false;
         active = false;
         blankTimer.stop();
         lockTimeout.stop();
@@ -77,7 +81,7 @@ Singleton {
     }
     function interact() {
         notificationWake = false;
-        if (!active || !lockSecure || lidClosed) return;
+        if (!active || intro || !lockSecure || lidClosed) return;
         wantsDark = false;
         dispatchDisplay();
         blankTimer.interval = 30000;
@@ -141,6 +145,7 @@ Singleton {
                 return;
             }
             root.dark = turningOff;
+            if (turningOff) root.intro = false;
             if (root.wantsDark !== turningOff) root.dispatchDisplay();
         }
     }
@@ -179,7 +184,7 @@ Singleton {
     Connections {
         target: root.hardwareOwner ? Notifications : null
         function onNotify(notification) {
-            if (!root.hardwareOwner || !root.active || !root.lockSecure || root.lidClosed || Notifications.silent || !root.allowed(notification)) return;
+            if (!root.hardwareOwner || !root.active || root.intro || !root.lockSecure || root.lidClosed || Notifications.silent || !root.allowed(notification)) return;
             // Do not cut short a user who is entering their password.
             if ((!root.dark && blankTimer.running && blankTimer.interval === 30000) || root.notificationWake || Date.now() - root.lastNotificationWake < 15000) return;
             root.notificationWake = true;
@@ -212,7 +217,7 @@ Singleton {
     IpcHandler {
         target: "slumber"
         function activate(): void { root.enter(); }
-        function status(): string { return JSON.stringify({active:root.active, secure:root.lockSecure, lidAction:root.lidAction, lidReady:root.lidReady, lidClosed:root.lidClosed, dark:root.dark, error:root.error}); }
+        function status(): string { return JSON.stringify({active:root.active, secure:root.lockSecure, lidAction:root.lidAction, lidReady:root.lidReady, lidClosed:root.lidClosed, dark:root.dark, intro:root.intro, error:root.error}); }
         function idleSuspend(): void {
             if (!root.active) Quickshell.execDetached(["systemctl", "suspend"]);
         }

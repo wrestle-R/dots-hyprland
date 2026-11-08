@@ -53,6 +53,10 @@ hl.bind("SUPER + Q", hl.dsp.global("quickshell:searchToggleReleaseInterrupt"), {
 -- Native Super tap override
 dofile((os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/super-tap.lua")
 
+-- Slumber shortcut (managed integration)
+local slumberShortcuts = (os.getenv("HOME") .. "/.config/hypr/custom/slumber-shortcuts.lua")
+if is_file_exists(slumberShortcuts) then dofile(slumberShortcuts) end
+
 -- Local settings shortcuts (managed integration)
 hl.unbind("SUPER + SHIFT + ALT + mouse:273") -- Unused AI text summary
 local settingsShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/settings-shortcuts.lua"
