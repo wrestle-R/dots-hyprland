@@ -41,6 +41,14 @@ Rectangle {
                 StyledToolTip { text: "Apply selected charge limit. Authentication required." }
             }
         }
+        StyledText {
+            Layout.fillWidth: true
+            text: ChargeLimit.statusLabel
+            font.pixelSize: Appearance.font.pixelSize.smaller
+            color: Appearance.colors.colSubtext
+            wrapMode: Text.Wrap
+            StyledToolTip { text: ChargeLimit.explanation }
+        }
         StyledText { Layout.fillWidth: true; wrapMode: Text.Wrap; visible: ChargeLimit.error.length > 0; text: ChargeLimit.error; font.pixelSize: Appearance.font.pixelSize.smaller; color: Appearance.colors.colError }
     }
 }

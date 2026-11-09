@@ -9,6 +9,9 @@ Singleton {
     property bool enabled: false
     property int actual: 100
     property int requested: 95
+    property bool initialized: false
+    property string statusLabel: "Reading battery…"
+    property string explanation: ""
     property string error: ""
     property bool busy: setter.running
     function refresh() { if (!reader.running) reader.running = true; }
@@ -25,7 +28,15 @@ Singleton {
         command: ["python3", Quickshell.shellPath("services/slumber_backend.py"), "battery-status"]
         stdout: StdioCollector {
             onStreamFinished: {
-                try { const data = JSON.parse(text); root.supported = data.supported; root.actual = data.batteries.length ? data.batteries[0].end : 100; root.enabled = root.actual < 100; }
+                try {
+                    const data=JSON.parse(text); root.supported=data.supported;
+                    const battery=data.batteries.length ? data.batteries[0] : null;
+                    root.actual=battery ? battery.end : 100;
+                    root.enabled=battery ? battery.enforced : false;
+                    root.statusLabel=battery ? battery.label : "Charge limits unavailable";
+                    root.explanation=battery ? battery.explanation : "";
+                    if (battery && !root.initialized) { root.requested=battery.preferred; root.initialized=true; }
+                }
                 catch (e) { root.supported = false; }
             }
         }

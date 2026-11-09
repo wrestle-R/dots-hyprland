@@ -70,13 +70,8 @@ def main():
             # Shell/helper unavailable: retain normal suspend policy.
             run(['systemctl', 'suspend'])
     elif args.action == 'battery-status':
-        batteries = []
-        for directory in sorted(Path('/sys/class/power_supply').glob('BAT*')):
-            end = directory/'charge_control_end_threshold'
-            start = directory/'charge_control_start_threshold'
-            if end.exists() and start.exists():
-                batteries.append({'name': directory.name, 'start': int(start.read_text()), 'end': int(end.read_text())})
-        print(json.dumps({'supported': bool(batteries), 'batteries': batteries}))
+        from battery_status import snapshot
+        print(json.dumps(snapshot()))
     else:
         display(args.action)
 

@@ -4,6 +4,7 @@ import argparse
 import fcntl
 import json
 import os
+import re
 from pathlib import Path
 import tempfile
 
@@ -42,23 +43,49 @@ def write_pair(directory, start, end):
         raise RuntimeError('Hardware did not retain requested thresholds')
 
 
+def mode_info(directory):
+    choices=directory/'charge_types'
+    active=directory/'charge_type'
+    if choices.exists():
+        text=choices.read_text().strip()
+        match=re.search(r'\[([^]]+)\]',text)
+        options=[name for name in ['Trickle','Fast','Standard','Adaptive','Custom','Long Life','Bypass'] if name in text]
+        return choices, match.group(1) if match else text, options
+    if active.exists(): return active,active.read_text().strip(),[]
+    return None,None,[]
+
+
+def write_mode(directory,mode):
+    path,current,options=mode_info(directory)
+    if path is None or mode is None or current==mode:return
+    if mode not in ['Trickle','Fast','Standard','Adaptive','Custom','Long Life','Bypass']:raise ValueError('Invalid charge mode')
+    path.write_text(mode+'\n')
+    if mode_info(directory)[1]!=mode:raise RuntimeError('Firmware did not retain charge mode '+mode)
+
+
 def apply(limit, enabled=True):
     thresholds(limit)
-    start, end = thresholds(limit if enabled else 100)
-    devices = [p for p in sorted(SYSFS.glob('BAT[0-9]*')) if (p/'charge_control_start_threshold').exists() and (p/'charge_control_end_threshold').exists()]
-    if not devices: raise RuntimeError('Hardware charge thresholds unavailable')
-    before = [(p, int((p/'charge_control_start_threshold').read_text()), int((p/'charge_control_end_threshold').read_text())) for p in devices]
-    previous = STATE.read_text() if STATE.exists() else None
-    original = json.loads(previous).get('original') if previous else {p.name:[a,b] for p,a,b in before}
+    start,end=thresholds(limit if enabled else 100)
+    devices=[p for p in sorted(SYSFS.glob('BAT[0-9]*')) if (p/'charge_control_start_threshold').exists() and (p/'charge_control_end_threshold').exists()]
+    if not devices:raise RuntimeError('Hardware charge thresholds unavailable')
+    before=[(p,int((p/'charge_control_start_threshold').read_text()),int((p/'charge_control_end_threshold').read_text()),mode_info(p)[1]) for p in devices]
+    previous=json.loads(STATE.read_text()) if STATE.exists() else {}
+    original=previous.get('original') or {p.name:[a,b] for p,a,b,_ in before}
+    modes=previous.get('original_modes') or {p.name:mode for p,_,_,mode in before if mode is not None}
     try:
-        for p,_,_ in before: write_pair(p, start, end)
-        atomic(STATE, json.dumps({'enabled':enabled,'limit':limit,'original':original})+'\n')
+        for p,_,_,_ in before:
+            write_pair(p,start,end)
+            _,_,options=mode_info(p)
+            if 'Custom' in options:write_mode(p,'Custom' if enabled else ('Standard' if 'Standard' in options else modes.get(p.name)))
+        atomic(STATE,json.dumps({'enabled':enabled,'limit':limit,'original':original,'original_modes':modes})+'\n')
     except Exception:
-        errors = []
-        for p,a,b in reversed(before):
-            try: write_pair(p,a,b)
-            except Exception as exc: errors.append(str(exc))
-        if errors: raise RuntimeError('Apply failed; hardware rollback also failed: ' + '; '.join(errors))
+        errors=[]
+        for p,a,b,mode in reversed(before):
+            try:
+                write_pair(p,a,b)
+                write_mode(p,mode)
+            except Exception as exc:errors.append(str(exc))
+        if errors:raise RuntimeError('Apply failed; hardware rollback also failed: '+'; '.join(errors))
         raise
     return {'enabled':enabled,'limit':end}
 
@@ -76,8 +103,9 @@ def main():
         if not STATE.exists(): return
         data=json.loads(STATE.read_text())
         for name,pair in data['original'].items():
-            if not name.startswith('BAT') or '/' in name: raise ValueError('Invalid battery identity')
+            if not re.fullmatch(r'BAT[0-9]+',name): raise ValueError('Invalid battery identity')
             write_pair(SYSFS/name,*pair)
+            write_mode(SYSFS/name,data.get('original_modes',{}).get(name))
         STATE.unlink()
         print('Original charge thresholds restored')
     else:

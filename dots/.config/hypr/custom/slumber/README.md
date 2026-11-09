@@ -12,7 +12,9 @@ The lockscreen follows the configured wallpaper, including a video thumbnail whe
 
 ## Charge limit
 
-The notification panel reads actual hardware thresholds. The proposed limit defaults to95%, adjustable55–95%. Press Apply or enable the switch to authenticate and apply it. Turning it off sets the upper threshold to100%. Charging resumes five percentage points below the chosen upper limit. The firmware does not discharge a battery that is already above the cap.
+The notification panel reads actual hardware thresholds. The proposed limit defaults to95%, adjustable55–95%. Press Apply or enable the switch to authenticate and apply it. Turning it off sets the upper threshold to100%. Charging resumes five percentage points below the chosen upper limit. The firmware does not discharge a battery that is already above the cap. The panel shows actual capacity, AC state and charging status, and explicitly identifies an above-cap battery with charging paused. A saved but inactive Custom-mode policy prompts Apply instead of showing the toggle as active.
+
+On Dell systems advertising charge modes, enabling the cap also selects Custom mode; thresholds saved under Adaptive mode are not treated as enforced. Turning the cap off selects Standard mode where available. The helper records the original charge mode for restoration and rolls it back along with thresholds on a failed apply.
 
 The root-owned helper accepts only fixed battery sysfs paths and bounded integer thresholds. It serializes requests, verifies hardware readback and rolls back on write/persistence failure. A system service reapplies the last successful choice after reboot. Unsupported hardware shows Unsupported; rejected/cancelled authentication retains the previous limit. Initial installation does not change existing thresholds (this Dell was50/90%).
 
@@ -86,4 +88,8 @@ Keep Breeze installed as a recovery theme. If the new login theme fails after a 
 
 `node test_notification_policy.cjs` checks approved aliases, unknown/partial-name denial, disabled groups and legacy hiding. `test_guardrails.py` uses only temporary files and fake sysfs: install/restore/idempotency, unknown-file rejection, partial-write rollback, concurrent-edit refusal, charge apply/off and persistence-failure rollback. Native isolated checks and live deployment results are recorded separately in `VERIFICATION.md`; unperformed physical/reboot checks must remain identified there.
 
-Combined rollback for the final live layer: `python3 customizations.py restore --backup /home/rdp/.local/state/hypr-slumber-backups/rollback-fyilhwkd --config-root /home/rdp/.config`. This returns all managed user-config files to their pre-feature versions in one checked transaction. System theme/helper rollback remains separate as described above.
+Combined rollback for the final live layer: `python3 customizations.py restore --backup /home/rdp/.local/state/hypr-slumber-backups/rollback-u_7z37xm --config-root /home/rdp/.config`. This returns all managed user-config files to their pre-feature versions in one checked transaction. System theme/helper rollback remains separate as described above.
+
+2026-11-09 Dell correction: verified a plugged-in96% battery with95% stop threshold, active Custom mode and hardware status Not charging. Earlier helper versions wrote thresholds without selecting Custom, allowing Adaptive mode to ignore them. The current helper fixes that and migrates the saved policy. Dell on this machine does not expose `charge_behaviour` force-discharge control; the feature stops new charging rather than actively draining AC-powered capacity.
+
+SDDM follow-up,2026-11-09: the user rejected the original layout and reported entry motion was not visible. A redesigned native preview demonstrated frame-gated blur/fade motion, but its panel design was also rejected. That proposal was not installed. The next design must retain a strongly blurred settled backdrop with floating controls; a more specific user description/reference is pending. Do not describe the login redesign as completed.
