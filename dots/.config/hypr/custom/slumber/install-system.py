@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 from customizations import write, transact
+from theme_tools import blurred_wallpapers, validate_theme
 
 HERE=Path(__file__).resolve().parent
 ROOT=Path('/var/lib/rdp-desktop')
@@ -28,6 +29,8 @@ def install(wallpaper):
     for name in ['Main.qml','metadata.desktop','theme.conf']:
         targets[Path('/usr/share/sddm/themes/rdp-slumber')/name]=(HERE/'sddm'/name).read_bytes()
     targets[Path('/usr/share/sddm/themes/rdp-slumber/wallpaper.jpg')]=wallpaper.read_bytes()
+    for name,image in blurred_wallpapers(wallpaper).items():
+        targets[Path('/usr/share/sddm/themes/rdp-slumber')/name]=image
     known=json.loads(INDEX.read_text()) if INDEX.exists() else {}
     changes=[]
     for path,new in targets.items():
@@ -41,6 +44,8 @@ def install(wallpaper):
         changes.append((path,old,new))
     if not changes:
         print('System integration already current');return
+    theme_root=Path('/usr/share/sddm/themes/rdp-slumber')
+    validate_theme({path.name:data for path,data in targets.items() if path.parent==theme_root})
     ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
     saved=Path(tempfile.mkdtemp(prefix=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ-'),dir=ROOT));saved.chmod(0o700)
     records=[]

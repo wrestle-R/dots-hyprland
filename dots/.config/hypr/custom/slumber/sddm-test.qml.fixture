@@ -1,0 +1,46 @@
+//@ pragma UseQApplication
+import QtQuick
+import QtQuick.Window
+import Quickshell
+import Quickshell.Io
+import "theme" as Theme
+ShellRoot {
+    id: test
+    property int requests: 0
+    QtObject {
+        id: backend
+        property bool canSuspend: false
+        property bool canReboot: false
+        property bool canPowerOff: false
+        signal loginFailed()
+        signal loginSucceeded()
+        signal informationMessage(string text)
+        function login(user,password,session) { test.requests++; }
+        function suspend() {}
+        function reboot() {}
+        function powerOff() {}
+    }
+    QtObject { id: mockUsers; property string lastUser: "tester" }
+    ListModel { id: mockSessions; property int lastIndex: 0; ListElement { name: "Hyprland" } ListElement { name: "Other session" } }
+    function named(item,name) { if(item.objectName===name)return item;for(const child of item.children||[]){const hit=named(child,name);if(hit)return hit;}return null; }
+    IpcHandler {
+        target: "themeTest"
+        function status(): string { return JSON.stringify({requests:test.requests,submitting:scene.submitting,failed:scene.loginError,notice:scene.notice,entryQueued:scene.entryQueued,intro:scene.introOpacity,form:scene.formOpacity,halo:scene.haloOpacity,passwordEmpty:test.named(scene,"passwordField").text.length===0,passwordFocused:test.named(scene,"passwordField").activeFocus,masked:test.named(scene,"passwordField").echoMode===TextInput.Password}); }
+        function credentials(): void { test.named(scene,"usernameField").text="tester";test.named(scene,"passwordField").text="test-fixture-only"; }
+        function emptyUser(): void { test.named(scene,"usernameField").text=""; }
+        function noSession(): void { test.named(scene,"sessionPicker").currentIndex=-1; }
+        function selectSession(): void { test.named(scene,"sessionPicker").currentIndex=1; }
+        function submit(): void { scene.login(); }
+        function fail(): void { backend.loginFailed(); }
+        function success(): void { backend.loginSucceeded(); }
+        function info(): void { backend.informationMessage("<b>literal message</b>"); }
+        function close(): void { Qt.quit(); }
+    }
+    Window {
+        visible: true
+        width: 1000; height: 625
+        minimumWidth: 1000; maximumWidth: 1000; minimumHeight: 625; maximumHeight: 625
+        title: "Disposable SDDM theme test"
+        Theme.Main { id: scene; anchors.fill: parent; authBackend: backend; users: mockUsers; sessions: mockSessions }
+    }
+}

@@ -1,10 +1,10 @@
 [SddmGreeterTheme]
 Name=RDP Slumber
-Description=Wallpaper login with a neutral password panel
+Description=Twin Halo login with a blurred landscape and floating controls
 Author=rdp
 License=MIT
 Type=sddm-theme
-Version=1.0
+Version=2.0
 MainScript=Main.qml
 ConfigFile=theme.conf
 Theme-Id=rdp-slumber
