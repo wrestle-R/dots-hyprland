@@ -102,7 +102,7 @@ Item {
 
         Component {
             id: dashboard
-            SidebarDashboard {}
+            TickDashboard {}
         }
         Component {
             id: aiChat

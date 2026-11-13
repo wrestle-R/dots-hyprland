@@ -87,6 +87,7 @@ def plan(config_root):
             raise CompatibilityError(f"Upstream integration changed in {relative}; no files were installed.")
         changes.append((path, old, edit["after"].encode()))
     assets = {
+        "TickDashboard.qml": "quickshell/ii/modules/ii/sidebarLeft/TickDashboard.qml",
         "InternetSwapControl.qml": "quickshell/ii/modules/ii/sidebarLeft/InternetSwapControl.qml",
         "internet-swap-sidebar.py": "hypr/custom/scripts/internet-swap-sidebar.py",
         "internet-swap-start.sh": "hypr/custom/scripts/internet-swap-start.sh",
