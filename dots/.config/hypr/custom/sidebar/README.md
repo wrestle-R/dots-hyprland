@@ -10,17 +10,9 @@ HyprTrack app. There is no weekly-total metric, scratchpad, or shortcut footer.
 The logo is the original `next/app/icon.svg` asset copied byte-for-byte from
 HyprTrack, rather than a recreated waveform. The source app remains unchanged.
 
-The to-do list underneath shares the shell's existing task service. Opening the
-drawer focuses the input automatically: start typing, then press Enter to create
-a task. Focus stays there for the next one, and unfinished drafts survive closing
-and reopening the drawer. You can also click its plus button. The heading's plus moves
-focus to that input. Click a checkbox to complete/reopen a task, or its close
-button to delete it. Unfinished tasks come first, with original order preserved
-inside each group. Text wraps, long lists scroll, and tasks persist across shell
-restarts in `${XDG_STATE_HOME:-~/.local/state}/quickshell/user/todo.json` on this
-QuickShell setup. Existing tasks are reused; no demonstration tasks are installed.
-The other shell to-do widget uses this same list. Back it up privately if needed
-when formatting the device; configuration snapshots do not include personal tasks.
+The list panel now uses **Task-tick** (`TickDashboard.qml`) and its signed-in native store, shared with the phone and web app. Install the latest Linux release from https://task-tick-beige.vercel.app/downloads and sign in once. The compatibility launcher `~/.local/bin/tick-and-done` must reach that installed app. Todos and Movies have separate modes; opening the drawer starts on Todos. Unfinished rows precede recent completed rows. Overflow hides older completed rows without deleting them. Movie entry offers authenticated TMDB suggestions through the desktop app; no service or TMDB key belongs in shell configuration.
+
+If the app is disconnected or signed out, the panel shows a connection message. It never silently switches to a different local todo database. Existing legacy todos at `${XDG_STATE_HOME:-~/.local/state}/quickshell/user/todo.json` are left intact. Space in an empty input toggles the existing Spotify helper; spaces inside a draft type normally. The guarded installer records Task-tick alongside the other local components so rebuilding the dotfiles preserves this integration.
 
 ## Data and refresh
 
