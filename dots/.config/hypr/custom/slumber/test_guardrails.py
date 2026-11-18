@@ -1,5 +1,5 @@
 from pathlib import Path
-import importlib.util, tempfile, json, shutil
+import hashlib, importlib.util, tempfile, json, shutil
 from unittest.mock import patch
 P=Path(__file__).resolve().parent
 def load(name):
@@ -11,6 +11,22 @@ with tempfile.TemporaryDirectory() as temp:
   p=root/item['path'];p.parent.mkdir(parents=True,exist_ok=True);p.write_text(item['before'])
  before={p.relative_to(root):p.read_bytes() for p in root.rglob('*') if p.is_file()}
  saved=m.install(root,backups);assert m.plan(root)==[]
+ # A reviewed installed variant must retain unrelated user bindings.
+ keybinds=root/'hypr/custom/keybinds.lua'
+ installed=keybinds.read_bytes()
+ custom=installed+b'\n-- Preserve a separate user shortcut.\n'
+ keybinds.write_bytes(custom)
+ package=Path(temp)/'reviewed-package'
+ shutil.copytree(P,package,ignore=shutil.ignore_patterns('__pycache__'))
+ manifest=json.loads((package/'integration.json').read_text())
+ for item in manifest:
+  if item['path']=='hypr/custom/keybinds.lua':
+   item['compatible_sha256']=[hashlib.sha256(custom).hexdigest()]
+ (package/'integration.json').write_text(json.dumps(manifest))
+ with patch.object(m,'HERE',package):
+  assert m.install(root,backups) is None
+  assert keybinds.read_bytes()==custom
+ keybinds.write_bytes(installed)
  m.restore(root,saved)
  assert all((root/p).read_bytes()==b for p,b in before.items())
  target=root/'quickshell/ii/shell.qml';target.write_text('unknown newer upstream')

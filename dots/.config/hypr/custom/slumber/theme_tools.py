@@ -1,24 +1,8 @@
-"""Offline blur preparation and no-authentication SDDM theme preflight."""
+"""Native SDDM theme preflight using the mock authentication backend."""
 import os
 from pathlib import Path
 import subprocess
 import tempfile
-
-
-def blurred_wallpapers(wallpaper):
-    """Bake the resting/entry blur once, before any privileged target writes."""
-    source=wallpaper.read_bytes()
-    result={}
-    for name,sigma in [('wallpaper-blurred.jpg',18),('wallpaper-intro.jpg',36)]:
-        completed=subprocess.run([
-            'magick','-limit','memory','128MiB','-limit','map','256MiB','-',
-            '-auto-orient','-resize','1920x1200>','-blur',f'0x{sigma}',
-            '-strip','-quality','90','jpg:-',
-        ],input=source,check=True,capture_output=True,timeout=45)
-        if not completed.stdout.startswith(b'\xff\xd8'):
-            raise RuntimeError(f'Blur preparation did not produce a JPEG: {name}')
-        result[name]=completed.stdout
-    return result
 
 
 def validate_theme(files):

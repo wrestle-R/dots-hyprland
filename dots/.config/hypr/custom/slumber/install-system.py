@@ -9,11 +9,14 @@ from pathlib import Path
 import subprocess
 import tempfile
 from customizations import write, transact
-from theme_tools import blurred_wallpapers, validate_theme
+from theme_tools import validate_theme
 
 HERE=Path(__file__).resolve().parent
 ROOT=Path('/var/lib/rdp-desktop')
 INDEX=ROOT/'installed.json'
+THEME_ROOT=Path('/usr/share/sddm/themes/rdp-slumber')
+# The previous standalone release was also installed at this path.
+LEGACY_LOGIN_SHA256='237d8e35ed9b233d2b231f31526029d0849c55ad07da0b0f973494a6cb5dbf4b'
 
 
 def command(*args):
@@ -27,10 +30,8 @@ def install(wallpaper):
         Path('/etc/sddm.conf.d/90-rdp-slumber.conf'):b'[Theme]\nCurrent=rdp-slumber\n',
     }
     for name in ['Main.qml','metadata.desktop','theme.conf']:
-        targets[Path('/usr/share/sddm/themes/rdp-slumber')/name]=(HERE/'sddm'/name).read_bytes()
+        targets[THEME_ROOT/name]=(HERE/'sddm'/name).read_bytes()
     targets[Path('/usr/share/sddm/themes/rdp-slumber/wallpaper.jpg')]=wallpaper.read_bytes()
-    for name,image in blurred_wallpapers(wallpaper).items():
-        targets[Path('/usr/share/sddm/themes/rdp-slumber')/name]=image
     known=json.loads(INDEX.read_text()) if INDEX.exists() else {}
     changes=[]
     for path,new in targets.items():
@@ -39,13 +40,15 @@ def install(wallpaper):
             if parent.is_symlink():raise RuntimeError(f'Refusing symlink parent: {parent}')
         old=path.read_bytes() if path.exists() else None
         if old==new:continue
-        if old is not None and hashlib.sha256(old).hexdigest()!=known.get(str(path)):
-            raise RuntimeError(f'Unknown system customization; no writes: {path}')
+        if old is not None:
+            digest=hashlib.sha256(old).hexdigest()
+            legacy_login=path==THEME_ROOT/'Main.qml' and digest==LEGACY_LOGIN_SHA256
+            if digest!=known.get(str(path)) and not legacy_login:
+                raise RuntimeError(f'Unknown system customization; no writes: {path}')
         changes.append((path,old,new))
     if not changes:
         print('System integration already current');return
-    theme_root=Path('/usr/share/sddm/themes/rdp-slumber')
-    validate_theme({path.name:data for path,data in targets.items() if path.parent==theme_root})
+    validate_theme({path.name:data for path,data in targets.items() if path.parent==THEME_ROOT})
     ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
     saved=Path(tempfile.mkdtemp(prefix=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ-'),dir=ROOT));saved.chmod(0o700)
     records=[]

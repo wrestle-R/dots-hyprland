@@ -259,6 +259,9 @@ Singleton {
     IpcHandler {
         target: "slumber"
         function activate(): void { root.enter(); }
+        function setLidAction(value: string): void {
+            if (value === "sleep" || value === "slumber") root.setLidAction(value);
+        }
         function status(): string { return JSON.stringify({active:root.active, secure:root.lockSecure, lidAction:root.lidAction, lidReady:root.lidReady, lidClosed:root.lidClosed, dark:root.dark, intro:root.intro, error:root.error}); }
         function idleSuspend(): void {
             if (!root.active) Quickshell.execDetached(["systemctl", "suspend"]);

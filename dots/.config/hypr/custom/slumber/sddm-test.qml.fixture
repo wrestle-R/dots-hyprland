@@ -25,7 +25,18 @@ ShellRoot {
     function named(item,name) { if(item.objectName===name)return item;for(const child of item.children||[]){const hit=named(child,name);if(hit)return hit;}return null; }
     IpcHandler {
         target: "themeTest"
-        function status(): string { return JSON.stringify({requests:test.requests,submitting:scene.submitting,failed:scene.loginError,notice:scene.notice,entryQueued:scene.entryQueued,intro:scene.introOpacity,form:scene.formOpacity,halo:scene.haloOpacity,passwordEmpty:test.named(scene,"passwordField").text.length===0,passwordFocused:test.named(scene,"passwordField").activeFocus,masked:test.named(scene,"passwordField").echoMode===TextInput.Password}); }
+        function status(): string { return JSON.stringify({requests:test.requests,submitting:scene.submitting,failed:scene.loginError,notice:scene.notice,passwordEmpty:test.named(scene,"passwordField").text.length===0,passwordFocused:test.named(scene,"passwordField").activeFocus,masked:test.named(scene,"passwordField").echoMode===TextInput.Password}); }
+        function layout(): string {
+            const user = test.named(scene, "usernameField");
+            const password = test.named(scene, "passwordField");
+            const session = test.named(scene, "sessionPicker");
+            return JSON.stringify({
+                insets: [user.leftPadding, password.leftPadding, session.leftPadding],
+                widths: [user.width, password.width, session.width],
+                heights: [user.height, password.height, session.height],
+                gaps: [password.y - user.y - user.height, session.y - password.y - password.height]
+            });
+        }
         function credentials(): void { test.named(scene,"usernameField").text="tester";test.named(scene,"passwordField").text="test-fixture-only"; }
         function emptyUser(): void { test.named(scene,"usernameField").text=""; }
         function noSession(): void { test.named(scene,"sessionPicker").currentIndex=-1; }

@@ -32,6 +32,8 @@ def plan(root):
     for item in sorted(json.loads((HERE/'integration.json').read_text()),key=lambda x:x['path']=='quickshell/ii/shell.qml'):
         path=destination(root,item['path']); old=path.read_bytes()
         if old==item['after'].encode(): continue
+        # A reviewed variant already has the integration. Preserve its other edits.
+        if hashlib.sha256(old).hexdigest() in item.get('compatible_sha256', []): continue
         if old not in [s.encode() for s in [item['before'],*item.get('previous',[])]]:
             raise RuntimeError(f'Changed upstream/custom file; no writes: {path}')
         changes.append((path,old,item['after'].encode()))

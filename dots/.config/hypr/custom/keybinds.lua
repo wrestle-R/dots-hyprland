@@ -54,7 +54,7 @@ hl.bind("SUPER + Q", hl.dsp.global("quickshell:searchToggleReleaseInterrupt"), {
 dofile((os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/super-tap.lua")
 
 -- Slumber shortcut (managed integration)
-local slumberShortcuts = (os.getenv("HOME") .. "/.config/hypr/custom/slumber-shortcuts.lua")
+local slumberShortcuts = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/hypr/custom/slumber-shortcuts.lua"
 if is_file_exists(slumberShortcuts) then dofile(slumberShortcuts) end
 
 -- Local settings shortcuts (managed integration)

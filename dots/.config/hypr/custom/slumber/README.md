@@ -8,7 +8,7 @@ Only T3 Code, Codex/Multi Codex and Visual Studio Code notifications are allowed
 
 **Super+I → Notifications** has three switches for these approved app groups. Turning one off also blocks its Slumber wakes. Exact normalized aliases cover the installed desktop names/IDs; substring matches and generic Electron names are rejected. The settings page does not start another notification server. Notification app names are routing metadata, not cryptographically authenticated sender identities. Preferences live in `~/.local/state/quickshell/slumber.json`, separate from upstream settings.
 
-The lockscreen follows the current configured wallpaper (or video thumbnail), with a stronger settled blur: blurMax24 at0.45, entering from1 over650ms after the image loads. Password controls and notifications remain crisp. SDDM uses the selected Twin Halo design with `hehe.jpg`, floating controls, two warm arcs and a strongly blurred settled landscape. Entry starts after the first presented frame; blur crossfade, scale and staggered fades finish within1.6seconds. Blur images are prepared once using ImageMagick; SDDM has no continuous blur shader, animation loop or background worker. Authentication starts immediately and stays independent of animation timing. No PAM or boot entries are changed.
+The lockscreen follows the current configured wallpaper (or video thumbnail), with a stronger settled blur: blurMax24 at0.45, entering from1 over650ms after the image loads. Password controls and notifications remain crisp. SDDM displays a sharp local wallpaper, geometric clock and three aligned login rows. The installer validates the theme in the native greeter before writing system files.
 
 ## Charge limit
 
@@ -20,7 +20,7 @@ The root-owned helper accepts only fixed battery sysfs paths and bounded integer
 
 ## Install
 
-Requires ImageMagick (`magick`), a Qt6 SDDM greeter, and the existing clipboard/sidebar/settings/image-state integrations, QuickShell, Lua Hyprland, hypridle, Python, PyGObject/Gio and the installed Polkit authentication agent. This version targets the inspected QuickShell0.3.2/Hyprland0.57.1 setup. It is intentionally strict about supported source versions.
+Requires a Qt6 SDDM greeter and the existing clipboard/sidebar/settings/image-state integrations, QuickShell, Lua Hyprland, hypridle, Python, PyGObject/Gio and the installed Polkit authentication agent. This version targets the inspected QuickShell0.3.2/Hyprland0.57.1 setup. It is intentionally strict about supported source versions.
 
 From this directory:
 
@@ -95,6 +95,6 @@ Combined rollback for the final live layer: `python3 customizations.py restore -
 
 2026-11-09 Dell correction: verified a plugged-in96% battery with95% stop threshold, active Custom mode and hardware status Not charging. Earlier helper versions wrote thresholds without selecting Custom, allowing Adaptive mode to ignore them. The current helper fixes that and migrates the saved policy. Dell on this machine does not expose `charge_behaviour` force-discharge control; the feature stops new charging rather than actively draining AC-powered capacity.
 
-Twin Halo selected by the user and implemented. Native entry recording shown before system installation. Native tests cover direct/duplicate authentication, invalid input, failure/success password clearing, plain-text messages and bounded motion. Real SDDM test mode loads with the software renderer and missing wallpaper assets; invalid QML is refused by the new pre-install test-mode gate. Real Enter/Escape/Tab were also checked in a disposable mock-auth preview. Actual password authentication after deploying this version and reboot persistence still require a normal user login.
+The current greeter uses the same theme as the standalone SDDM repo. Native tests cover equal row heights and gaps, consistent text insets, invalid QML refusal, missing wallpaper, duplicate submission, password clearing and masking, and focus on failure. Real authentication for a new deployment is verified at the next normal login.
 
-Theme API references: [SDDM theming](https://github.com/sddm/sddm/wiki/Theming), [Qt Window frameSwapped](https://doc.qt.io/qt-6/qml-qtquick-window.html).
+[SDDM theme API](https://github.com/sddm/sddm/wiki/Theming)
