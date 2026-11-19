@@ -21,6 +21,10 @@ def main():
             setup.SDDM.write_bytes(stock)
             setup.apply(setup.plan("tester", enabled=True))
             assert setup.SDDM.read_bytes().replace(setup.BLOCK, b"") == stock
+            assert b"timeout=2" in setup.SERVICE.read_bytes()
+            setup.SERVICE.write_bytes(setup.SERVICE.read_bytes().replace(b"timeout=2", b"timeout=5"))
+            setup.apply(setup.plan("tester", enabled=True))
+            assert b"timeout=2" in setup.SERVICE.read_bytes()
             assert b"auth include sudo\n" in setup.SERVICE.read_bytes()
             assert b"pam_login_service=sudo" in setup.POLICY.read_bytes()
             assert setup.HELPER.stat().st_mode & 0o777 == 0o755

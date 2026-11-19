@@ -93,7 +93,7 @@ Install Arch's `fprintd` package, then run `fprintd-enroll` and `fprintd-verify`
 
 After installing the Slumber SDDM theme, run `sudo python3 fingerprint-auth.py enable "$USER"` from this directory to opt in to SDDM and sudo fingerprint authentication. SDDM keeps the normal password sign-in and offers **Use fingerprint** separately. After a failed or missed scan it returns focus to the password field. A fingerprint sign-in may leave the desktop keyring asking for its password.
 
-Ordinary sudo asks for a fingerprint and then prompts for your password after a failed scan or short timeout. If the fingerprint library itself crashes, `sudo -k -i` goes straight to the stock sudo password service. A terminal or process can have a separate pending sudo request, so only touch the reader for requests you initiated. From the password-only root shell, run `python3 /absolute/path/to/fingerprint-auth.py disable your-username` to remove the SDDM and sudo integration. Disabling it does not delete enrolled fingerprints.
+Ordinary sudo asks for a fingerprint and then prompts for your password after a failed scan or two-second timeout. If the fingerprint library itself crashes, `sudo -k -i` goes straight to the stock sudo password service. A terminal or process can have a separate pending sudo request, so only touch the reader for requests you initiated. From the password-only root shell, run `python3 /absolute/path/to/fingerprint-auth.py disable your-username` to remove the SDDM and sudo integration. Disabling it does not delete enrolled fingerprints.
 
 ## Verification
 

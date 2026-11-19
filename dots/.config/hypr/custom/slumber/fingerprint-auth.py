@@ -30,11 +30,12 @@ auth [success=done default=die] pam_fprintd.so max-tries=1 timeout=8
 """ + END
 SUDO = b"""#%PAM-1.0
 auth requisite pam_faillock.so preauth
-auth [success=done default=ignore] pam_fprintd.so max-tries=1 timeout=5
+auth [success=done default=ignore] pam_fprintd.so max-tries=1 timeout=2
 auth include sudo
 account include sudo
 session include sudo
 """
+PREVIOUS_SUDO = SUDO.replace(b"timeout=2", b"timeout=5")
 SELECTOR = b"""#!/usr/bin/bash -p
 # A nonempty response follows the original SDDM PAM configuration.
 IFS= read -r -N 1 password_byte && exit 1
@@ -74,7 +75,8 @@ def plan(username, enabled):
     for path, managed, mode in ((HELPER, SELECTOR, 0o755), (SERVICE, SUDO, 0o644),
                                 (OVERRIDE, THEME_OPT_IN, 0o644), (POLICY, policy, 0o440)):
         old = checked_bytes(path)
-        if old not in (None, managed):
+        previous = PREVIOUS_SUDO if path == SERVICE else None
+        if old not in (None, managed, previous):
             raise RuntimeError(f"Refusing to overwrite a local customization: {path}")
         changes[path] = (path, old, managed if enabled else None, mode)
     changes[SDDM] = (SDDM, raw, sddm, 0o644)
