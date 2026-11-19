@@ -20,6 +20,7 @@ Scope {
     property bool unlockInProgress: false
     property bool showFailure: false
     property bool fingerprintsConfigured: false
+    readonly property bool fingerprintScanning: fingerPam.active
     property var targetAction: LockContext.ActionEnum.Unlock
     property bool alsoInhibitIdle: false
 
@@ -62,12 +63,19 @@ Scope {
     function tryUnlock(alsoInhibitIdle = false) {
         root.alsoInhibitIdle = alsoInhibitIdle;
         root.unlockInProgress = true;
+        stopFingerPam();
         pam.start();
     }
 
     function tryFingerUnlock() {
+        if (!GlobalStates.screenLocked || root.targetAction !== LockContext.ActionEnum.Unlock
+            || root.unlockInProgress || fingerPam.active) {
+            return;
+        }
         if (root.fingerprintsConfigured) {
             fingerPam.start();
+        } else {
+            fingerprintCheckProc.running = true;
         }
     }
 
@@ -80,11 +88,12 @@ Scope {
     Process {
         id: fingerprintCheckProc
         running: true
-        command: ["bash", "-c", "fprintd-list $(whoami)"]
+        command: ["fprintd-list", Quickshell.env("USER")]
         stdout: StdioCollector {
             id: fingerprintOutputCollector
             onStreamFinished: {
                 root.fingerprintsConfigured = fingerprintOutputCollector.text.includes("Fingerprints for user");
+                if (root.fingerprintsConfigured) root.tryFingerUnlock();
             }
         }
         onExited: (exitCode, exitStatus) => {
@@ -115,6 +124,7 @@ Scope {
                 root.unlockInProgress = false;
                 GlobalStates.screenUnlockFailed = true;
                 root.showFailure = true;
+                if (root.fingerprintsConfigured) root.tryFingerUnlock();
             }
         }
     }
@@ -126,11 +136,10 @@ Scope {
         config: "fprintd.conf"
 
         onCompleted: result => {
-            if (result == PamResult.Success) {
-                root.unlocked(root.targetAction);
-                stopFingerPam();
-            } else if (result == PamResult.Error) { // if timeout or etc..
-                tryFingerUnlock()
+            if (result == PamResult.Success && GlobalStates.screenLocked
+                && root.targetAction === LockContext.ActionEnum.Unlock && !root.unlockInProgress) {
+                root.clearText();
+                root.unlocked(LockContext.ActionEnum.Unlock);
             }
         }
     }

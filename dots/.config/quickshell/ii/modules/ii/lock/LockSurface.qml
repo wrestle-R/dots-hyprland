@@ -112,26 +112,37 @@ MouseArea {
         opacity: root.toolbarOpacity
 
         // Fingerprint
-        Loader {
-            Layout.leftMargin: 10
-            Layout.rightMargin: 6
+        ToolbarButton {
+            implicitWidth: height
             Layout.alignment: Qt.AlignVCenter
-            active: root.context.fingerprintsConfigured
-            visible: active
+            visible: root.context.fingerprintsConfigured
+            enabled: !root.context.unlockInProgress && root.context.targetAction === LockContext.ActionEnum.Unlock
+            Accessible.name: Translation.tr("Use fingerprint")
+            onClicked: {
+                root.context.tryFingerUnlock();
+                root.forceFieldFocus();
+            }
 
-            sourceComponent: MaterialSymbol {
-                id: fingerprintIcon
+            contentItem: MaterialSymbol {
                 fill: 1
                 text: "fingerprint"
                 iconSize: Appearance.font.pixelSize.hugeass
                 color: Appearance.colors.colOnSurfaceVariant
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
         }
 
         ToolbarTextField {
             id: passwordBox
             Layout.rightMargin: -Layout.leftMargin
-            placeholderText: GlobalStates.screenUnlockFailed ? Translation.tr("Incorrect password") : Translation.tr("Enter password")
+            placeholderText: {
+                if (GlobalStates.screenUnlockFailed) return Translation.tr("Incorrect password");
+                if (root.context.fingerprintScanning && root.context.targetAction === LockContext.ActionEnum.Unlock) {
+                    return Translation.tr("Touch reader or enter password");
+                }
+                return Translation.tr("Enter password");
+            }
 
             // Style
             clip: true
