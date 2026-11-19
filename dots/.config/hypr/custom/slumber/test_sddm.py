@@ -82,6 +82,20 @@ def main():
                 assert s["failed"] and not s["submitting"] and s["passwordEmpty"] and s["passwordFocused"] and s["masked"]
                 call("credentials");call("submit");call("success")
                 assert state()["requests"]==2 and state()["passwordEmpty"] and state()["masked"]
+                def fingerprint():
+                    return json.loads(call("fingerprintState"))
+                assert not fingerprint()["available"]
+                call("enableFingerprint")
+                assert fingerprint()["available"]
+                call("fail");call("submit")
+                assert state()["requests"]==2 and "choose Use fingerprint" in state()["notice"]
+                call("credentials");call("submitFingerprint")
+                assert state()["requests"]==3 and fingerprint()["scanning"] and fingerprint()["submittedEmptyPassword"]
+                call("fail")
+                assert not fingerprint()["scanning"] and state()["passwordFocused"]
+                assert state()["notice"]=="Fingerprint sign-in failed. Use your password."
+                call("credentials");call("submit")
+                assert state()["requests"]==4 and not fingerprint()["submittedEmptyPassword"]
                 layout = json.loads(call("layout"))
                 for dimension in ("insets", "widths", "heights", "gaps"):
                     values = layout[dimension]

@@ -7,6 +7,7 @@ import "theme" as Theme
 ShellRoot {
     id: test
     property int requests: 0
+    property bool submittedEmptyPassword: false
     QtObject {
         id: backend
         property bool canSuspend: false
@@ -15,7 +16,10 @@ ShellRoot {
         signal loginFailed()
         signal loginSucceeded()
         signal informationMessage(string text)
-        function login(user,password,session) { test.requests++; }
+        function login(user,password,session) {
+            test.requests++;
+            test.submittedEmptyPassword = password.length === 0;
+        }
         function suspend() {}
         function reboot() {}
         function powerOff() {}
@@ -42,6 +46,15 @@ ShellRoot {
         function noSession(): void { test.named(scene,"sessionPicker").currentIndex=-1; }
         function selectSession(): void { test.named(scene,"sessionPicker").currentIndex=1; }
         function submit(): void { scene.login(); }
+        function enableFingerprint(): void { scene.fingerprintEnabled = true; }
+        function submitFingerprint(): void { test.named(scene, "fingerprintButton").click(); }
+        function fingerprintState(): string {
+            return JSON.stringify({
+                available: test.named(scene, "fingerprintButton").visible,
+                scanning: scene.scanningFingerprint,
+                submittedEmptyPassword: test.submittedEmptyPassword
+            });
+        }
         function fail(): void { backend.loginFailed(); }
         function success(): void { backend.loginSucceeded(); }
         function info(): void { backend.informationMessage("<b>literal message</b>"); }

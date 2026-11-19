@@ -87,6 +87,14 @@ pkexec /usr/bin/python3 "$PWD/install-system.py" restore --backup /var/lib/rdp-d
 
 Keep Breeze installed as a recovery theme. If the new login theme fails after a future update, use a TTY and remove only `/etc/sddm.conf.d/90-rdp-slumber.conf` to return to the previous theme choice. This does not bypass password authentication. Do not restart SDDM while unsaved apps are running.
 
+### Optional fingerprint sign-in
+
+Install Arch's `fprintd` package, then run `fprintd-enroll` and `fprintd-verify` as your regular user. Slumber's Quickshell lock checks for enrolled fingers on startup and when you next lock. The password field is always available. The fingerprint button starts another scan after a timeout.
+
+After installing the Slumber SDDM theme, run `sudo python3 fingerprint-auth.py enable "$USER"` from this directory to opt in to SDDM and sudo fingerprint authentication. SDDM keeps the normal password sign-in and offers **Use fingerprint** separately. After a failed or missed scan it returns focus to the password field. A fingerprint sign-in may leave the desktop keyring asking for its password.
+
+Ordinary sudo asks for a fingerprint and then prompts for your password after a failed scan or short timeout. If the fingerprint library itself crashes, `sudo -k -i` goes straight to the stock sudo password service. A terminal or process can have a separate pending sudo request, so only touch the reader for requests you initiated. From the password-only root shell, run `python3 /absolute/path/to/fingerprint-auth.py disable your-username` to remove the SDDM and sudo integration. Disabling it does not delete enrolled fingerprints.
+
 ## Verification
 
 `node test_notification_policy.cjs` checks approved aliases, unknown/partial-name denial, disabled groups and legacy hiding. `test_guardrails.py` uses only temporary files and fake sysfs: install/restore/idempotency, unknown-file rejection, partial-write rollback, concurrent-edit refusal, charge apply/off and persistence-failure rollback. Native isolated checks and live deployment results are recorded separately in `VERIFICATION.md`; unperformed physical/reboot checks must remain identified there.

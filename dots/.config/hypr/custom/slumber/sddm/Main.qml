@@ -14,6 +14,8 @@ Rectangle {
     property var sessions: sessionModel
     property date now: new Date()
     property bool submitting: false
+    property bool fingerprintEnabled: typeof config !== "undefined" && config.boolValue("FingerprintEnabled")
+    property bool scanningFingerprint: false
     property bool loginError: false
     property string notice: ""
     readonly property color ink: "#f8ead7"
@@ -26,16 +28,22 @@ Rectangle {
     readonly property real fit: Math.min(width / 1600, height / 1000)
     Timer { interval: 1000; running: true; repeat: true; onTriggered: root.now = new Date() }
 
-    function login() {
+    function login(useFingerprint = false) {
         if (submitting) return;
         if (!username.text.trim()) { notice = "Enter your username."; username.forceActiveFocus(); return; }
         if (session.currentIndex < 0) { notice = "No session available."; session.forceActiveFocus(); return; }
+        if (fingerprintEnabled && !useFingerprint && !password.text.length) {
+            notice = "Enter your password or choose Use fingerprint.";
+            password.forceActiveFocus();
+            return;
+        }
+        scanningFingerprint = useFingerprint;
         submitting = true;
         reveal.checked = false;
         loginError = false;
-        notice = "Signing in…";
+        notice = useFingerprint ? "Touch the fingerprint reader…" : "Signing in…";
         // Authentication never waits for animation timers or frame delivery.
-        root.authBackend.login(username.text.trim(), password.text, session.currentIndex);
+        root.authBackend.login(username.text.trim(), useFingerprint ? "" : password.text, session.currentIndex);
     }
     Component.onCompleted: Qt.callLater(function() {
         if (username.text.length) password.forceActiveFocus(); else username.forceActiveFocus();
@@ -166,7 +174,7 @@ Rectangle {
                 currentIndex: root.sessions.lastIndex >= 0 ? root.sessions.lastIndex : 0
                 enabled: !root.submitting
                 leftPadding: root.fieldInset; rightPadding: 48
-                KeyNavigation.tab: sleepButton.visible ? sleepButton : restartButton.visible ? restartButton : powerButton.visible ? powerButton : username
+                KeyNavigation.tab: fingerprintButton.visible ? fingerprintButton : sleepButton.visible ? sleepButton : restartButton.visible ? restartButton : powerButton.visible ? powerButton : username
                 Accessible.name: "Session"
                 contentItem: Text { text: session.displayText; color: root.ink; font.family: "Noto Sans"; font.pixelSize: root.fieldFontSize; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
                 indicator: StrokeIcon { x: session.width-width-14; anchors.verticalCenter: parent.verticalCenter; width: 19; height: 19; glyph: "down"; ink: root.ink }
@@ -204,6 +212,29 @@ Rectangle {
                 Accessible.role: Accessible.AlertMessage
             }
         }
+        Button {
+            id: fingerprintButton
+            objectName: "fingerprintButton"
+            anchors.left: auth.left
+            anchors.top: auth.bottom
+            anchors.topMargin: 26
+            visible: root.fingerprintEnabled
+            enabled: !root.submitting
+            text: "Use fingerprint"
+            KeyNavigation.tab: sleepButton.visible ? sleepButton : restartButton.visible ? restartButton : powerButton.visible ? powerButton : username
+            onClicked: root.login(true)
+            contentItem: Text {
+                text: fingerprintButton.text
+                color: root.ink
+                font.family: "Noto Sans"
+                font.pixelSize: 16
+                verticalAlignment: Text.AlignVCenter
+            }
+            background: Rectangle {
+                radius: 6
+                color: fingerprintButton.activeFocus || fingerprintButton.hovered ? "#25ffffff" : "transparent"
+            }
+        }
         Row {
             anchors.right: auth.right
             anchors.top: auth.bottom
@@ -221,10 +252,11 @@ Rectangle {
             root.loginError = true;
             password.clear();
             reveal.checked = false;
-            root.notice = "Sign-in failed. Please try again.";
+            root.notice = root.scanningFingerprint ? "Fingerprint sign-in failed. Use your password." : "Sign-in failed. Please try again.";
+            root.scanningFingerprint = false;
             password.forceActiveFocus();
         }
-        function onLoginSucceeded() { password.clear(); reveal.checked = false; root.notice = ""; }
+        function onLoginSucceeded() { password.clear(); reveal.checked = false; root.scanningFingerprint = false; root.notice = ""; }
         function onInformationMessage(text) { root.notice = text; }
     }
     component QuietButton: Button {
