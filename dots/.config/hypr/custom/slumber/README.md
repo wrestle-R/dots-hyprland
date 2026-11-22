@@ -89,20 +89,10 @@ Keep Breeze installed as a recovery theme. If the new login theme fails after a 
 
 ### Optional fingerprint sign-in
 
-Install Arch's `fprintd` package, then run `fprintd-enroll` and `fprintd-verify` as your regular user. Slumber's Quickshell lock checks for enrolled fingers on startup and when you next lock. The password field is always available. The fingerprint button starts another scan after a timeout.
+Install Arch's `fprintd` package, then run `fprintd-enroll` and `fprintd-verify` as your regular user. The Quickshell lock checks for enrolled fingers and automatically re-arms the reader after a missed scan or timeout. Its password field stays available while scanning. Clearing an idle password field does not stop fingerprint authentication.
 
-After installing the Slumber SDDM theme, run `sudo python3 fingerprint-auth.py enable "$USER"` from this directory to opt in to SDDM and sudo fingerprint authentication. SDDM keeps the normal password sign-in and offers **Use fingerprint** separately. After a failed or missed scan it returns focus to the password field. A fingerprint sign-in may leave the desktop keyring asking for its password.
+SDDM uses passwords only. The fingerprint installer removes the previous SDDM PAM block, selector helper and theme override when upgrading. It does not change the stock password, account or session stack.
 
-Ordinary sudo asks for a fingerprint and then prompts for your password after a failed scan or two-second timeout. If the fingerprint library itself crashes, `sudo -k -i` goes straight to the stock sudo password service. A terminal or process can have a separate pending sudo request, so only touch the reader for requests you initiated. From the password-only root shell, run `python3 /absolute/path/to/fingerprint-auth.py disable your-username` to remove the SDDM and sudo integration. Disabling it does not delete enrolled fingerprints.
+For concurrent terminal password entry and fingerprint scanning, install `pam-fprint-grosshack` from the AUR, then run `sudo python3 fingerprint-auth.py enable "$USER"` from this directory. This uses a separate `sudo-fingerprint` PAM service. The password prompt appears immediately and the reader scans for up to 60 seconds, allowing up to 10 missed scans. After that, sudo keeps its normal password fallback. This replaces the old two-second fingerprint-first wait. The module is an additional third-party PAM dependency; SDDM and the lock's password authentication do not use it.
 
-## Verification
-
-`node test_notification_policy.cjs` checks approved aliases, unknown/partial-name denial, disabled groups and legacy hiding. `test_guardrails.py` uses only temporary files and fake sysfs: install/restore/idempotency, unknown-file rejection, partial-write rollback, concurrent-edit refusal, charge apply/off and persistence-failure rollback. Native isolated checks and live deployment results are recorded separately in `VERIFICATION.md`; unperformed physical/reboot checks must remain identified there.
-
-Combined rollback for the final live layer: `python3 customizations.py restore --backup /home/rdp/.local/state/hypr-slumber-backups/rollback-c5p0f_tm --config-root /home/rdp/.config`. This returns all managed user-config files to their pre-feature versions in one checked transaction. System theme/helper rollback remains separate as described above.
-
-2026-11-09 Dell correction: verified a plugged-in96% battery with95% stop threshold, active Custom mode and hardware status Not charging. Earlier helper versions wrote thresholds without selecting Custom, allowing Adaptive mode to ignore them. The current helper fixes that and migrates the saved policy. Dell on this machine does not expose `charge_behaviour` force-discharge control; the feature stops new charging rather than actively draining AC-powered capacity.
-
-The current greeter uses the same theme as the standalone SDDM repo. Native tests cover equal row heights and gaps, consistent text insets, invalid QML refusal, missing wallpaper, duplicate submission, password clearing and masking, and focus on failure. Real authentication for a new deployment is verified at the next normal login.
-
-[SDDM theme API](https://github.com/sddm/sddm/wiki/Theming)
+`sudo -k -i` and graphical askpass retain the stock sudo password service for recovery. Only touch the reader for sudo requests you initiated. From a password-only root shell, run `python3 /absolute/path/to/fingerprint-auth.py disable your-username` to remove the terminal integration. Disabling it does not delete enrolled fingerprints.

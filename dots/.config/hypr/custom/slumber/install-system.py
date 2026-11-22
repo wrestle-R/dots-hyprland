@@ -17,6 +17,8 @@ INDEX=ROOT/'installed.json'
 THEME_ROOT=Path('/usr/share/sddm/themes/rdp-slumber')
 # The previous standalone release was also installed at this path.
 LEGACY_LOGIN_SHA256='237d8e35ed9b233d2b231f31526029d0849c55ad07da0b0f973494a6cb5dbf4b'
+# Fingerprint-era theme previously deployed separately from the install index.
+FINGERPRINT_LOGIN_SHA256='7e9f94b1da71ab8a7786397fcae07ad5253f6a072a02211d3c90fcf627fe7896'
 
 
 def command(*args):
@@ -42,7 +44,7 @@ def install(wallpaper):
         if old==new:continue
         if old is not None:
             digest=hashlib.sha256(old).hexdigest()
-            legacy_login=path==THEME_ROOT/'Main.qml' and digest==LEGACY_LOGIN_SHA256
+            legacy_login=path==THEME_ROOT/'Main.qml' and digest in (LEGACY_LOGIN_SHA256, FINGERPRINT_LOGIN_SHA256)
             if digest!=known.get(str(path)) and not legacy_login:
                 raise RuntimeError(f'Unknown system customization; no writes: {path}')
         changes.append((path,old,new))

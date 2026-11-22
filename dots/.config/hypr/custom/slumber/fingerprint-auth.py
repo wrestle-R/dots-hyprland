@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Enable or disable optional SDDM and sudo fingerprint authentication on Arch."""
+"""Configure terminal fingerprint authentication; keep SDDM password-only."""
 
 import argparse
 import fcntl
@@ -30,12 +30,19 @@ auth [success=done default=die] pam_fprintd.so max-tries=1 timeout=8
 """ + END
 SUDO = b"""#%PAM-1.0
 auth requisite pam_faillock.so preauth
+auth [success=done default=ignore] pam_fprintd_grosshack.so max-tries=10 timeout=60
+auth include sudo
+account include sudo
+session include sudo
+"""
+PREVIOUS_SUDO = b"""#%PAM-1.0
+auth requisite pam_faillock.so preauth
 auth [success=done default=ignore] pam_fprintd.so max-tries=1 timeout=2
 auth include sudo
 account include sudo
 session include sudo
 """
-PREVIOUS_SUDO = SUDO.replace(b"timeout=2", b"timeout=5")
+OLDER_SUDO = PREVIOUS_SUDO.replace(b"timeout=2", b"timeout=5")
 SELECTOR = b"""#!/usr/bin/bash -p
 # A nonempty response follows the original SDDM PAM configuration.
 IFS= read -r -N 1 password_byte && exit 1
@@ -63,22 +70,16 @@ def plan(username, enabled):
         raise RuntimeError(f"Missing SDDM PAM policy: {SDDM}")
     if raw.count(START) != raw.count(BLOCK) or raw.count(END) != raw.count(BLOCK) or raw.count(BLOCK) > 1:
         raise RuntimeError("The SDDM fingerprint block has local edits")
-    if enabled and BLOCK not in raw:
-        matches = list(re.finditer(rb"^auth[\t ]+include[\t ]+system-login[\t ]*$", raw, re.M))
-        if len(matches) != 1 or re.search(rb"^auth[\t ]", raw[:matches[0].start()], re.M):
-            raise RuntimeError("SDDM PAM differs from the Arch package configuration")
-        start = matches[0].start()
-        sddm = raw[:start] + BLOCK + raw[start:]
-    else:
-        sddm = raw if enabled else raw.replace(BLOCK, b"")
+    # Migrate the previous optional SDDM integration back to its stock stack.
+    sddm = raw.replace(BLOCK, b"")
     changes = {}
     for path, managed, mode in ((HELPER, SELECTOR, 0o755), (SERVICE, SUDO, 0o644),
                                 (OVERRIDE, THEME_OPT_IN, 0o644), (POLICY, policy, 0o440)):
         old = checked_bytes(path)
-        previous = PREVIOUS_SUDO if path == SERVICE else None
-        if old not in (None, managed, previous):
+        previous = (PREVIOUS_SUDO, OLDER_SUDO) if path == SERVICE else ()
+        if old not in (None, managed, *previous):
             raise RuntimeError(f"Refusing to overwrite a local customization: {path}")
-        changes[path] = (path, old, managed if enabled else None, mode)
+        changes[path] = (path, old, managed if enabled and path in (SERVICE, POLICY) else None, mode)
     changes[SDDM] = (SDDM, raw, sddm, 0o644)
     # Publish PAM before the UI and policy. Reverse the order on removal.
     order = [HELPER, SERVICE, SDDM, OVERRIDE, POLICY]
@@ -119,16 +120,13 @@ def main():
     if os.geteuid() != 0:
         parser.error("Run this through sudo")
     if args.action == "enable":
-        if not Path("/usr/lib/security/pam_fprintd.so").is_file():
-            parser.error("Install fprintd first")
-        theme = checked_bytes(THEME / "Main.qml")
-        if not theme or b'boolValue("FingerprintEnabled")' not in theme:
-            parser.error("Install the fingerprint-aware Slumber SDDM theme first")
+        if not Path("/usr/lib/security/pam_fprintd_grosshack.so").is_file():
+            parser.error("Install pam-fprint-grosshack first for simultaneous password and fingerprint")
     with LOCK.open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         subprocess.run([VISUDO, "-c"], check=True)
         apply(plan(args.username, args.action == "enable"))
-    print(f"Fingerprint authentication set to {args.action} for SDDM and sudo.")
+    print(f"Terminal fingerprint authentication set to {args.action}; SDDM uses passwords only.")
 
 
 if __name__ == "__main__":

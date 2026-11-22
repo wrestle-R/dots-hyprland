@@ -14,11 +14,10 @@ Rectangle {
     property var sessions: sessionModel
     property date now: new Date()
     property bool submitting: false
-    property bool fingerprintEnabled: typeof config !== "undefined" && config.boolValue("FingerprintEnabled")
-    property bool scanningFingerprint: false
     property bool loginError: false
     property string notice: ""
     readonly property color ink: "#f8ead7"
+    readonly property color clockInk: wallpaper.status === Image.Ready ? "#183247" : ink
     readonly property color muted: "#c9cdd0"
     readonly property int rowWidth: 460
     readonly property int rowHeight: 58
@@ -28,28 +27,22 @@ Rectangle {
     readonly property real fit: Math.min(width / 1600, height / 1000)
     Timer { interval: 1000; running: true; repeat: true; onTriggered: root.now = new Date() }
 
-    function login(useFingerprint = false) {
+    function login() {
         if (submitting) return;
         if (!username.text.trim()) { notice = "Enter your username."; username.forceActiveFocus(); return; }
         if (session.currentIndex < 0) { notice = "No session available."; session.forceActiveFocus(); return; }
-        if (fingerprintEnabled && !useFingerprint && !password.text.length) {
-            notice = "Enter your password or choose Use fingerprint.";
-            password.forceActiveFocus();
-            return;
-        }
-        scanningFingerprint = useFingerprint;
         submitting = true;
         reveal.checked = false;
         loginError = false;
-        notice = useFingerprint ? "Touch the fingerprint reader…" : "Signing in…";
+        notice = "Signing in…";
         // Authentication never waits for animation timers or frame delivery.
-        root.authBackend.login(username.text.trim(), useFingerprint ? "" : password.text, session.currentIndex);
+        root.authBackend.login(username.text.trim(), password.text, session.currentIndex);
     }
     Component.onCompleted: Qt.callLater(function() {
         if (username.text.length) password.forceActiveFocus(); else username.forceActiveFocus();
     })
 
-    Image { anchors.fill: parent; source: "wallpaper.jpg"; fillMode: Image.PreserveAspectCrop }
+    Image { id: wallpaper; anchors.fill: parent; source: "wallpaper.jpg"; fillMode: Image.PreserveAspectCrop }
     Rectangle { anchors.fill: parent; gradient: Gradient { GradientStop { position: 0; color: "transparent" } GradientStop { position: 0.65; color: "#1011263b" } GradientStop { position: 1; color: "#90102338" } } }
     Item {
         id: stage
@@ -62,8 +55,9 @@ Rectangle {
             x: 945; y: 165; width: 565; height: 115
             property string timeText: Qt.formatDateTime(root.now, "hhmm")
             onTimeTextChanged: requestPaint()
+            Connections { target: root; function onClockInkChanged() { clockFace.requestPaint(); } }
             onPaint: {
-                const c=getContext("2d"); c.reset(); c.fillStyle="#183247";
+                const c=getContext("2d"); c.reset(); c.fillStyle=root.clockInk;
                 const maps=["111101101101111","010110010010111","111001111100111","111001111001111","101101111001001","111100111001111","111100111101111","111001001001001","111101111101111","111101111001111"];
                 const unit=height/5;
                 for(let n=0;n<4;n++) {
@@ -74,7 +68,7 @@ Rectangle {
                 }
             }
         }
-        Text { x: 945; y: 310; width: 540; text: Qt.formatDateTime(root.now,"dddd, d MMMM"); color: "#183247"; font.family: "Noto Sans"; font.pixelSize: 27; horizontalAlignment: Text.AlignRight }
+        Text { x: 945; y: 310; width: 540; text: Qt.formatDateTime(root.now,"dddd, d MMMM"); color: root.clockInk; font.family: "Noto Sans"; font.pixelSize: 27; horizontalAlignment: Text.AlignRight }
         Item {
             id: auth
             objectName: "authControls"
@@ -174,7 +168,7 @@ Rectangle {
                 currentIndex: root.sessions.lastIndex >= 0 ? root.sessions.lastIndex : 0
                 enabled: !root.submitting
                 leftPadding: root.fieldInset; rightPadding: 48
-                KeyNavigation.tab: fingerprintButton.visible ? fingerprintButton : sleepButton.visible ? sleepButton : restartButton.visible ? restartButton : powerButton.visible ? powerButton : username
+                KeyNavigation.tab: sleepButton.visible ? sleepButton : restartButton.visible ? restartButton : powerButton.visible ? powerButton : username
                 Accessible.name: "Session"
                 contentItem: Text { text: session.displayText; color: root.ink; font.family: "Noto Sans"; font.pixelSize: root.fieldFontSize; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
                 indicator: StrokeIcon { x: session.width-width-14; anchors.verticalCenter: parent.verticalCenter; width: 19; height: 19; glyph: "down"; ink: root.ink }
@@ -212,30 +206,8 @@ Rectangle {
                 Accessible.role: Accessible.AlertMessage
             }
         }
-        Button {
-            id: fingerprintButton
-            objectName: "fingerprintButton"
-            anchors.left: auth.left
-            anchors.top: auth.bottom
-            anchors.topMargin: 26
-            visible: root.fingerprintEnabled
-            enabled: !root.submitting
-            text: "Use fingerprint"
-            KeyNavigation.tab: sleepButton.visible ? sleepButton : restartButton.visible ? restartButton : powerButton.visible ? powerButton : username
-            onClicked: root.login(true)
-            contentItem: Text {
-                text: fingerprintButton.text
-                color: root.ink
-                font.family: "Noto Sans"
-                font.pixelSize: 16
-                verticalAlignment: Text.AlignVCenter
-            }
-            background: Rectangle {
-                radius: 6
-                color: fingerprintButton.activeFocus || fingerprintButton.hovered ? "#25ffffff" : "transparent"
-            }
-        }
         Row {
+            objectName: "powerControls"
             anchors.right: auth.right
             anchors.top: auth.bottom
             anchors.topMargin: 26
@@ -252,17 +224,16 @@ Rectangle {
             root.loginError = true;
             password.clear();
             reveal.checked = false;
-            root.notice = root.scanningFingerprint ? "Fingerprint sign-in failed. Use your password." : "Sign-in failed. Please try again.";
-            root.scanningFingerprint = false;
+            root.notice = "Sign-in failed. Please try again.";
             password.forceActiveFocus();
         }
-        function onLoginSucceeded() { password.clear(); reveal.checked = false; root.scanningFingerprint = false; root.notice = ""; }
+        function onLoginSucceeded() { password.clear(); reveal.checked = false; root.notice = ""; }
         function onInformationMessage(text) { root.notice = text; }
     }
     component QuietButton: Button {
         id: control
         property string glyph
-        implicitWidth: text === "Shut down" ? 160 : 145
+        implicitWidth: text === "Shut down" ? 156 : 140
         implicitHeight: 45
         padding: 10
         scale: down ? 0.975 : 1

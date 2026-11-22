@@ -47,8 +47,25 @@ Scope {
         id: passwordClearTimer
         interval: 10000
         onTriggered: {
-            root.reset();
+            if (!root.unlockInProgress) {
+                root.clearText();
+                root.resetTargetAction();
+            }
         }
+    }
+
+    // PAM ends a scan after a timeout or missed finger. Re-arm while locked,
+    // including after the password field clears, without taking its focus.
+    Timer {
+        interval: 1500
+        repeat: true
+        running: GlobalStates.screenLocked && root.fingerprintsConfigured
+            && !root.unlockInProgress && root.targetAction === LockContext.ActionEnum.Unlock
+        onTriggered: root.tryFingerUnlock()
+    }
+
+    onTargetActionChanged: {
+        if (targetAction !== LockContext.ActionEnum.Unlock) stopFingerPam();
     }
 
     onCurrentTextChanged: {

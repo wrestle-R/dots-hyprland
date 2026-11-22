@@ -52,10 +52,12 @@ def main():
         subprocess.run(["qmllint",str(theme/"Main.qml")],check=True,capture_output=True)
         (theme / "wallpaper.jpg").unlink()
         installer.validate_theme({p.name:p.read_bytes() for p in theme.iterdir()})
+        if os.environ.get("SDDM_CAPTURE_WALLPAPER"):
+            shutil.copyfile(os.environ["SDDM_CAPTURE_WALLPAPER"], theme/"wallpaper.jpg")
         with (root/"native.log").open("w+") as log:
             process=subprocess.Popen(["qs","-p",str(root/"shell.qml"),"--no-color"],env=env,stdout=log,stderr=subprocess.STDOUT)
-            def call(name):
-                return subprocess.check_output(["qs","-p",str(root/"shell.qml"),"ipc","call","themeTest",name],text=True,stderr=subprocess.STDOUT,timeout=10).strip()
+            def call(name, *args):
+                return subprocess.check_output(["qs","-p",str(root/"shell.qml"),"ipc","call","themeTest",name,*map(str,args)],text=True,stderr=subprocess.STDOUT,timeout=10).strip()
             def state():
                 return json.loads(call("status"))
             try:
@@ -82,21 +84,17 @@ def main():
                 assert s["failed"] and not s["submitting"] and s["passwordEmpty"] and s["passwordFocused"] and s["masked"]
                 call("credentials");call("submit");call("success")
                 assert state()["requests"]==2 and state()["passwordEmpty"] and state()["masked"]
-                def fingerprint():
-                    return json.loads(call("fingerprintState"))
-                assert not fingerprint()["available"]
-                call("enableFingerprint")
-                assert fingerprint()["available"]
-                call("fail");call("submit")
-                assert state()["requests"]==2 and "choose Use fingerprint" in state()["notice"]
-                call("credentials");call("submitFingerprint")
-                assert state()["requests"]==3 and fingerprint()["scanning"] and fingerprint()["submittedEmptyPassword"]
-                call("fail")
-                assert not fingerprint()["scanning"] and state()["passwordFocused"]
-                assert state()["notice"]=="Fingerprint sign-in failed. Use your password."
-                call("credentials");call("submit")
-                assert state()["requests"]==4 and not fingerprint()["submittedEmptyPassword"]
+                assert call("passwordOnly") == "true", "SDDM still offers fingerprint sign-in"
                 layout = json.loads(call("layout"))
+                assert layout["powerFits"], layout
+                for width, height in ((1920, 1200), (1366, 768), (1024, 768)):
+                    call("resize", width, height)
+                    time.sleep(.1)
+                    bounds = json.loads(call("layout"))
+                    assert bounds["powerFits"] and bounds["powerBottom"] <= height and bounds["powerRight"] <= width, bounds
+                    if os.environ.get("SDDM_CAPTURE_DIR"):
+                        call("capture", str(Path(os.environ["SDDM_CAPTURE_DIR"]) / f"login-{width}x{height}.png"))
+                        time.sleep(.4)
                 for dimension in ("insets", "widths", "heights", "gaps"):
                     values = layout[dimension]
                     assert values[0] > 0 and len(set(values)) == 1, layout

@@ -18,16 +18,22 @@ def main():
         root = Path(directory)
         paths = {key: root / key for key in ("SDDM", "HELPER", "SERVICE", "OVERRIDE", "POLICY")}
         with patch.multiple(setup, **paths, VISUDO="/usr/bin/true"):
-            setup.SDDM.write_bytes(stock)
+            setup.SDDM.write_bytes(stock.replace(b"auth include", setup.BLOCK + b"auth include"))
+            setup.HELPER.write_bytes(setup.SELECTOR)
+            setup.OVERRIDE.write_bytes(setup.THEME_OPT_IN)
+            setup.SERVICE.write_bytes(setup.PREVIOUS_SUDO)
             setup.apply(setup.plan("tester", enabled=True))
             assert setup.SDDM.read_bytes().replace(setup.BLOCK, b"") == stock
-            assert b"timeout=2" in setup.SERVICE.read_bytes()
-            setup.SERVICE.write_bytes(setup.SERVICE.read_bytes().replace(b"timeout=2", b"timeout=5"))
+            assert b"pam_fprintd_grosshack.so" in setup.SERVICE.read_bytes()
+            assert b"timeout=60" in setup.SERVICE.read_bytes()
+            setup.SERVICE.write_bytes(setup.OLDER_SUDO)
             setup.apply(setup.plan("tester", enabled=True))
-            assert b"timeout=2" in setup.SERVICE.read_bytes()
+            assert b"pam_fprintd_grosshack.so" in setup.SERVICE.read_bytes()
+            assert b"timeout=60" in setup.SERVICE.read_bytes()
             assert b"auth include sudo\n" in setup.SERVICE.read_bytes()
             assert b"pam_login_service=sudo" in setup.POLICY.read_bytes()
-            assert setup.HELPER.stat().st_mode & 0o777 == 0o755
+            assert not setup.HELPER.exists() and not setup.OVERRIDE.exists()
+            assert setup.BLOCK not in setup.SDDM.read_bytes()
             assert setup.POLICY.stat().st_mode & 0o777 == 0o440
             assert setup.plan("tester", enabled=True) == []
 

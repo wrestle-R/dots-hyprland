@@ -10,9 +10,9 @@ ShellRoot {
     property bool submittedEmptyPassword: false
     QtObject {
         id: backend
-        property bool canSuspend: false
-        property bool canReboot: false
-        property bool canPowerOff: false
+        property bool canSuspend: true
+        property bool canReboot: true
+        property bool canPowerOff: true
         signal loginFailed()
         signal loginSucceeded()
         signal informationMessage(string text)
@@ -30,11 +30,19 @@ ShellRoot {
     IpcHandler {
         target: "themeTest"
         function status(): string { return JSON.stringify({requests:test.requests,submitting:scene.submitting,failed:scene.loginError,notice:scene.notice,passwordEmpty:test.named(scene,"passwordField").text.length===0,passwordFocused:test.named(scene,"passwordField").activeFocus,masked:test.named(scene,"passwordField").echoMode===TextInput.Password}); }
+        function passwordOnly(): bool { return !test.named(scene, "fingerprintButton"); }
         function layout(): string {
             const user = test.named(scene, "usernameField");
             const password = test.named(scene, "passwordField");
             const session = test.named(scene, "sessionPicker");
+            const power = test.named(scene, "powerControls");
+            const controls = test.named(scene, "authControls");
             return JSON.stringify({
+                powerFits: power.width <= controls.width,
+                powerBottom: power.mapToItem(scene, 0, power.height).y,
+                powerRight: power.mapToItem(scene, power.width, 0).x,
+                sceneHeight: scene.height,
+                sceneWidth: scene.width,
                 insets: [user.leftPadding, password.leftPadding, session.leftPadding],
                 widths: [user.width, password.width, session.width],
                 heights: [user.height, password.height, session.height],
@@ -46,24 +54,17 @@ ShellRoot {
         function noSession(): void { test.named(scene,"sessionPicker").currentIndex=-1; }
         function selectSession(): void { test.named(scene,"sessionPicker").currentIndex=1; }
         function submit(): void { scene.login(); }
-        function enableFingerprint(): void { scene.fingerprintEnabled = true; }
-        function submitFingerprint(): void { test.named(scene, "fingerprintButton").click(); }
-        function fingerprintState(): string {
-            return JSON.stringify({
-                available: test.named(scene, "fingerprintButton").visible,
-                scanning: scene.scanningFingerprint,
-                submittedEmptyPassword: test.submittedEmptyPassword
-            });
-        }
         function fail(): void { backend.loginFailed(); }
         function success(): void { backend.loginSucceeded(); }
         function info(): void { backend.informationMessage("<b>literal message</b>"); }
+        function resize(width: int, height: int): void { previewWindow.width = width; previewWindow.height = height; }
+        function capture(path: string): void { scene.grabToImage(function(result) { result.saveToFile(path); }); }
         function close(): void { Qt.quit(); }
     }
     Window {
+        id: previewWindow
         visible: true
         width: 1000; height: 625
-        minimumWidth: 1000; maximumWidth: 1000; minimumHeight: 625; maximumHeight: 625
         title: "Disposable SDDM theme test"
         Theme.Main { id: scene; anchors.fill: parent; authBackend: backend; users: mockUsers; sessions: mockSessions }
     }
