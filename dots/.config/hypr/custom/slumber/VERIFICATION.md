@@ -34,3 +34,11 @@ Twin Halo selected by the user and implemented. Native entry recording shown bef
 - Live lock backup: ~/.local/state/hypr-slumber-backups/20261122T055615Z-o8xm5zag. Restore with `python3 customizations.py restore --backup "$HOME/.local/state/hypr-slumber-backups/20261122T055615Z-o8xm5zag"`.
 - System theme backup: /var/lib/rdp-desktop/20261122T055636Z-xj352rkk. Restore with `sudo python3 install-system.py restore --backup /var/lib/rdp-desktop/20261122T055636Z-xj352rkk`.
 - Authentication configuration backup: /var/lib/rdp-desktop/auth-20261122-before.tar. Restore the previous authentication configuration with `sudo tar -xpf /var/lib/rdp-desktop/auth-20261122-before.tar -C /`. This brings back the former SDDM fingerprint configuration and two-second sudo policy. The new PAM package remains installed but unused by that policy.
+
+## 2026-11-22 fingerprint settings
+
+- Added Super+I → Fingerprint with live reader status, saved-finger list, add/replace enrollment, scan progress, cancellation and confirmed per-finger removal. All operations go through the current user's fprintd D-Bus service. No new privileged helper or password storage is used.
+- Seven backend checks cover enrollment success/failure/cancel, device release after errors, specific repeatable deletion and status metadata. Native settings checks read the real Goodix reader, then use a disposable adapter for enrollment progress, cancellation and removal. No real saved scan was changed by automated testing. Physical add/replace/remove and any Polkit prompt remain to be tested through the page.
+- Settings navigation collapses to icons with named tooltips and scrolls at short heights. The selected page stays visible during keyboard navigation. Native captures inspected at 750x500, 1100x750 and 1450x900; long fingerprint lists scroll. Compact finger rows stack actions when needed.
+- The lock rechecks enrollment on each new lock so settings changes take effect on the next lock cycle.
+- Installed settings page and responsive navigation with a combined pre-page rollback checkpoint at ~/.local/state/hypr-slumber-backups/rollback-da7e4djb. Restore with `python3 customizations.py restore --backup "$HOME/.local/state/hypr-slumber-backups/rollback-da7e4djb"`.

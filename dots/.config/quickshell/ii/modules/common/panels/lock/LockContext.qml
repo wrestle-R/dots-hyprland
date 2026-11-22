@@ -38,6 +38,7 @@ Scope {
 
     function reset() {
         root.resetTargetAction();
+        root.fingerprintsConfigured = false;
         root.clearText();
         root.unlockInProgress = false;
         stopFingerPam();

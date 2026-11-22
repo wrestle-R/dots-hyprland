@@ -89,6 +89,8 @@ Keep Breeze installed as a recovery theme. If the new login theme fails after a 
 
 ### Optional fingerprint sign-in
 
+Open **Super+I → Fingerprint** to see saved fingers and your reader. Choose a finger and select **Add finger** to enroll it, with live scan progress and a Cancel button. **Replace** records a new scan for the selected finger. **Remove** asks for confirmation and deletes only that finger. The page uses the current user's fprintd permissions and the desktop authentication agent; it does not run sudo or handle raw fingerprint data. Enrollment stops after two minutes if unfinished.
+
 Install Arch's `fprintd` package, then run `fprintd-enroll` and `fprintd-verify` as your regular user. The Quickshell lock checks for enrolled fingers and automatically re-arms the reader after a missed scan or timeout. Its password field stays available while scanning. Clearing an idle password field does not stop fingerprint authentication.
 
 SDDM uses passwords only. The fingerprint installer removes the previous SDDM PAM block, selector helper and theme override when upgrading. It does not change the stock password, account or session stack.

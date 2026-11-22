@@ -23,47 +23,13 @@ ApplicationWindow {
     property real contentPadding: 8
     property bool showNextTime: false
     property var pages: [
-        {
-            name: Translation.tr("Quick"),
-            icon: "instant_mix",
-            component: "modules/settings/QuickConfig.qml"
-        },
-        {
-            name: Translation.tr("General"),
-            icon: "browse",
-            component: "modules/settings/GeneralConfig.qml"
-        },
-        {
-            name: Translation.tr("Bar"),
-            icon: "toast",
-            iconRotation: 180,
-            component: "modules/settings/BarConfig.qml"
-        },
-        {
-            name: Translation.tr("Background"),
-            icon: "texture",
-            component: "modules/settings/BackgroundConfig.qml"
-        },
-        {
-            name: Translation.tr("Interface"),
-            icon: "bottom_app_bar",
-            component: "modules/settings/InterfaceConfig.qml"
-        },
-        {
-            name: Translation.tr("Services"),
-            icon: "settings",
-            component: "modules/settings/ServicesConfig.qml"
-        },
-        {
-            name: Translation.tr("Advanced"),
-            icon: "construction",
-            component: "modules/settings/AdvancedConfig.qml"
-        },
-        {
-            name: Translation.tr("About"),
-            icon: "info",
-            component: "modules/settings/About.qml"
-        }
+        {name: Translation.tr("General"), icon: "browse", component: "modules/settings/GeneralConfig.qml"},
+        {name: Translation.tr("Appearance"), icon: "palette", component: "modules/settings/QuickConfig.qml"},
+        {name: Translation.tr("Keybindings"), icon: "keyboard", component: "modules/settings/KeybindingsConfig.qml"},
+        {name: Translation.tr("Fingerprint"), icon: "fingerprint", component: "modules/settings/FingerprintConfig.qml"},
+        {name: Translation.tr("Notifications"), icon: "notifications", component: "modules/settings/NotificationsConfig.qml"},
+        {name: Translation.tr("Services"), icon: "settings", component: "modules/settings/ServicesConfig.qml"},
+        {name: Translation.tr("Advanced"), icon: "construction", component: "modules/settings/DetailsConfig.qml"}
     ]
     property int currentPage: 0
 
@@ -161,69 +127,88 @@ ApplicationWindow {
                 Behavior on implicitWidth {
                     animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
                 }
-                NavigationRail { // Window content with navigation rail and content pane
-                    id: navRail
-                    anchors {
-                        left: parent.left
-                        top: parent.top
-                        bottom: parent.bottom
+                StyledFlickable {
+                    id: navScroll
+                    anchors.fill: parent
+                    contentWidth: width
+                    contentHeight: navRail.implicitHeight
+                    clip: true
+                    function revealCurrent() {
+                        const top = navTabs.y + root.currentPage * 56;
+                        const bottom = top + 56;
+                        let nextY = contentY;
+                        if (top < contentY) nextY = top;
+                        else if (bottom > contentY + height) nextY = bottom - height;
+                        contentY = Math.max(0, Math.min(nextY, contentHeight - height));
                     }
-                    spacing: 10
-                    expanded: root.width > 900
-                    
-                    NavigationRailExpandButton {
-                        focus: root.visible
+                    onHeightChanged: Qt.callLater(revealCurrent)
+                    Connections {
+                        target: root
+                        function onCurrentPageChanged() { Qt.callLater(navScroll.revealCurrent); }
                     }
+                    NavigationRail { // Window content with navigation rail and content pane
+                        id: navRail
+                        width: navScroll.width
+                        spacing: 10
+                        expanded: root.width > 900
 
-                    FloatingActionButton {
-                        id: fab
-                        property bool justCopied: false
-                        iconText: justCopied ? "check" : "edit"
-                        buttonText: justCopied ? Translation.tr("Path copied") : Translation.tr("Config file")
-                        expanded: navRail.expanded
-                        downAction: () => {
-                            Qt.openUrlExternally(`${Directories.config}/illogical-impulse/config.json`);
-                        }
-                        altAction: () => {
-                            Quickshell.clipboardText = CF.FileUtils.trimFileProtocol(`${Directories.config}/illogical-impulse/config.json`);
-                            fab.justCopied = true;
-                            revertTextTimer.restart()
+                        NavigationRailExpandButton {
+                            focus: root.visible
                         }
 
-                        Timer {
-                            id: revertTextTimer
-                            interval: 1500
-                            onTriggered: {
-                                fab.justCopied = false;
+                        FloatingActionButton {
+                            id: fab
+                            property bool justCopied: false
+                            iconText: justCopied ? "check" : "edit"
+                            buttonText: justCopied ? Translation.tr("Path copied") : Translation.tr("Config file")
+                            expanded: navRail.expanded
+                            downAction: () => {
+                                Qt.openUrlExternally(`${Directories.config}/illogical-impulse/config.json`);
+                            }
+                            altAction: () => {
+                                Quickshell.clipboardText = CF.FileUtils.trimFileProtocol(`${Directories.config}/illogical-impulse/config.json`);
+                                fab.justCopied = true;
+                                revertTextTimer.restart()
+                            }
+
+                            Timer {
+                                id: revertTextTimer
+                                interval: 1500
+                                onTriggered: {
+                                    fab.justCopied = false;
+                                }
+                            }
+
+                            StyledToolTip {
+                                text: Translation.tr("Open the shell config file\nAlternatively right-click to copy path")
                             }
                         }
 
-                        StyledToolTip {
-                            text: Translation.tr("Open the shell config file\nAlternatively right-click to copy path")
-                        }
-                    }
-
-                    NavigationRailTabArray {
-                        currentIndex: root.currentPage
-                        expanded: navRail.expanded
-                        Repeater {
-                            model: root.pages
-                            NavigationRailButton {
-                                required property var index
-                                required property var modelData
-                                toggled: root.currentPage === index
-                                onPressed: root.currentPage = index;
-                                expanded: navRail.expanded
-                                buttonIcon: modelData.icon
-                                buttonIconRotation: modelData.iconRotation || 0
-                                buttonText: modelData.name
-                                showToggledHighlight: false
+                        NavigationRailTabArray {
+                            id: navTabs
+                            currentIndex: root.currentPage
+                            expanded: navRail.expanded
+                            Repeater {
+                                model: root.pages
+                                NavigationRailButton {
+                                    required property var index
+                                    required property var modelData
+                                    toggled: root.currentPage === index
+                                    onPressed: root.currentPage = index;
+                                    expanded: navRail.expanded
+                                    buttonIcon: modelData.icon
+                                    buttonIconRotation: modelData.iconRotation || 0
+                                    buttonText: navRail.expanded ? modelData.name : ""
+                                    Accessible.name: modelData.name
+                                    StyledToolTip { extraVisibleCondition: !navRail.expanded; text: modelData.name }
+                                    showToggledHighlight: false
+                                }
                             }
                         }
-                    }
 
-                    Item {
-                        Layout.fillHeight: true
+                        Item {
+                            Layout.fillHeight: true
+                        }
                     }
                 }
             }

@@ -8,5 +8,7 @@
   "quickshell/ii/modules/ii/sidebarRight/ChargeLimitControl.qml": "ChargeLimitControl.qml",
   "quickshell/ii/modules/ii/lock/LockNotifications.qml": "LockNotifications.qml",
   "quickshell/ii/modules/settings/NotificationsConfig.qml": "NotificationsConfig.qml",
-  "hypr/custom/slumber-shortcuts.lua": "slumber-shortcuts.lua"
+  "hypr/custom/slumber-shortcuts.lua": "slumber-shortcuts.lua",
+  "quickshell/ii/modules/settings/FingerprintConfig.qml": "FingerprintConfig.qml",
+  "quickshell/ii/services/fingerprint_settings.py": "fingerprint_settings.py"
 }

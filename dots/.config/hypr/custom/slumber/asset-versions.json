@@ -36,5 +36,8 @@
   ],
   "hypr/custom/slumber-shortcuts.lua": [
     "0f55f527207ef07ea4942e4aaabf826cc1259fb8cc8a48ed9bddbca03563fed1"
+  ],
+  "quickshell/ii/modules/settings/FingerprintConfig.qml": [
+    "36273bac6219fad54540fd5d0da761f7a4395bee88edc3be4ddd4bf0cc474275"
   ]
 }
